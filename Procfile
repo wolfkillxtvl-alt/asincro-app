@@ -1,1 +1,1 @@
-web: python Asincro.py
+web: gunicorn Asincro:app
