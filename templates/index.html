@@ -1,1 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASINCRO - Iniciar Sesión</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  
+  body, html {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
 
+  /* PANEL IZQUIERDO: FONDO CON IMAGEN TECNOLÓGICA SEMIVISTA Y TEXTOS MÁS GRANDES */
+  .left-panel {
+    flex: 1.2;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.90) 0%, rgba(30, 41, 59, 0.85) 100%), 
+                url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 70px;
+    color: #fff;
+    position: relative;
+  }
+
+  .left-content h1 {
+    font-size: 44px;
+    font-weight: 900;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .left-content p {
+    font-size: 18px;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 45px;
+    max-width: 650px;
+  }
+
+  .features-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .feature-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 20px;
+    width: 210px;
+    backdrop-filter: blur(6px);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .feature-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .feature-desc {
+    font-size: 13.5px;
+    color: #e2e8f0;
+    line-height: 1.4;
+  }
+
+  /* PANEL DERECHO: CAJA DE LOGIN CLARA Y MODERNA */
+  .right-panel {
+    flex: 0.9;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .login-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 45px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+
+  .login-logo {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .login-subtitle {
+    font-size: 14.5px;
+    color: #64748b;
+    margin-bottom: 30px;
+  }
+
+  /* BOTÓN GOOGLE CON INTERACCIÓN AVANZADA */
+  .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #ffffff;
+    color: #1e293b;
+    border: 2px solid #cbd5e1;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  }
+
+  .btn-google:hover {
+    background: #f8fafc;
+    border-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+  }
+
+  .btn-google:active {
+    transform: translateY(0);
+  }
+
+  .google-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  @media (max-width: 900px) {
+    body, html { overflow: auto; flex-direction: column; height: auto; }
+    .left-panel { padding: 40px 20px; }
+    .right-panel { padding: 40px 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- PANEL IZQUIERDO CON IMAGEN DE FONDO Y TEXTOS MÁS GRANDES -->
+  <div class="left-panel">
+    <div class="left-content">
+      <h1>¡Bienvenidos! Una nueva experiencia de colaboración empieza aquí</h1>
+      <p>Accede a tus salas grupales, proyectos de gestión y recursos asíncronos desde una plataforma centralizada, moderna y sin restricciones.</p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-title">Salas Grupales</div>
+          <div class="feature-desc">Crea códigos únicos y gestiona tus equipos de trabajo fácilmente.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Proyectos Ágiles</div>
+          <div class="feature-desc">Organiza modelos de negocio y entregas académicas sin fricciones.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-title">Sinergia Total</div>
+          <div class="feature-desc">Participa con recursos interactivos y perfiles totalmente personalizados.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO CON LOGIN GOOGLE -->
+  <div class="right-panel">
+    <div class="login-card">
+      <div class="login-logo"><span>⚡</span> ASINCRO</div>
+      <p class="login-subtitle">Inicia sesión en Asincro con tu cuenta institucional</p>
+      
+      <a href="/login/google" class="btn-google">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.19v3.15C3.17 21.32 7.23 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.19C.43 8.1 0 9.98 0 12s.43 3.9 1.19 5.42l4.09-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.68 1.19 6.58l4.09 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        Continuar con Google
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
