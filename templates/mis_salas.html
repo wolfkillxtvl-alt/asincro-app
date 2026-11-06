@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASINCRO - Mis Salas</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+  .navbar {
+    background: var(--primary); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 20px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .nav-left { display: flex; align-items: center; gap: 30px; }
+  .brand-logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: var(--accent); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  
+  .nav-links { display: flex; gap: 12px; }
+  .nav-link { color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 10px; font-size: 14.5px; font-weight: 600; background: rgba(255,255,255,0.08); transition: all 0.25s ease; border: 1px solid rgba(255,255,255,0.05); }
+  .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.22); transform: translateY(-2px); border-color: rgba(255,255,255,0.2); }
+
+  .nav-right { position: relative; display: flex; align-items: center; }
+  .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 999px; position: relative; user-select: none; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.1); }
+  .profile-trigger:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+  .user-avatar-top { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+  
+  .notification-dot { position: absolute; top: 2px; right: 12px; width: 12px; height: 12px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; display: none; }
+  .notification-dot.active { display: block; }
+  .dot-inline { display: none; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+  .dot-inline.active { display: inline-block; }
+
+  .dropdown-menu {
+    display: none; position: absolute; top: 58px; right: 0; background: #fff; color: var(--text); width: 250px;
+    border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; z-index: 100; border: 1px solid #e5e7eb;
+  }
+  .dropdown-menu.show { display: block; }
+  .dropdown-item {
+    padding: 13px 18px; font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f3f4f6; transition: all 0.2s; cursor: pointer;
+  }
+  .dropdown-item:hover { background: #f8fafc; color: #2563eb; transform: translateX(3px); }
+  .dropdown-item.logout { color: #ef4444; border-bottom: none; }
+  .dropdown-item.logout:hover { background: #fef2f2; color: #dc2626; }
+
+  .main-container { max-width: 1200px; width: 100%; margin: 35px auto; padding: 0 20px; flex: 1; }
+  .page-heading { font-size: 28px; font-weight: 800; color: #111827; margin-bottom: 18px; }
+
+  .outer-board { background: #ffffff; border: 2px solid #cbd5e1; border-radius: 18px; padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.03); }
+  .board-header { font-size: 15px; font-weight: 700; color: #111827; padding-bottom: 14px; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+
+  .filter-bar { display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; align-items: center; }
+  .filter-icon-btn { padding: 10px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #fff; font-size: 16px; cursor: pointer; }
+  .search-input { flex: 1; min-width: 220px; padding: 10px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .search-input:focus { border-color: #2563eb; }
+  .filter-select { padding: 10px 16px; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #fff; font-size: 13px; font-weight: 600; color: var(--text); outline: none; cursor: pointer; }
+
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+
+  .room-card {
+    background: #ffffff; border: 2px solid #cbd5e1; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; color: inherit; position: relative;
+  }
+  .room-card:hover { transform: translateY(-4px); border-color: #2563eb; box-shadow: 0 10px 25px rgba(37,99,235,0.1); }
+
+  .room-card-banner { height: 140px; width: 100%; background: linear-gradient(135deg, #475569 0%, #1e293b 100%); border-bottom: 2px solid #e2e8f0; overflow: hidden; }
+  .room-card-banner img { width: 100%; height: 100%; object-fit: cover; }
+
+  .room-card-body { padding: 18px 20px; display: flex; flex-direction: column; flex: 1; justify-content: space-between; }
+  .room-card-title { font-size: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; text-decoration: underline; margin-bottom: 6px; }
+  .room-card-code { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 18px; }
+  
+  .room-card-footer { 
+    display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); font-weight: 600; 
+    padding-top: 10px; border-top: 1px solid #f1f5f9; position: relative; 
+  }
+
+  /* MENÚ FLOTANTE DE LOS TRES PUNTITOS */
+  .menu-dots-wrapper { position: relative; }
+  .dots-btn { background: none; border: none; font-size: 18px; font-weight: 900; cursor: pointer; padding: 2px 6px; color: #111; border-radius: 4px; }
+  .dots-btn:hover { background: #f1f5f9; }
+
+  .card-dropdown-menu {
+    display: none; position: absolute; bottom: 30px; right: 0; background: #fff; border: 1px solid #cbd5e1;
+    border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 140px; z-index: 50; overflow: hidden; text-align: left;
+  }
+  .card-dropdown-menu.show { display: block; }
+  .card-dropdown-item {
+    background: none; border: none; width: 100%; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #ef4444;
+    cursor: pointer; display: flex; align-items: center; gap: 8px; text-align: left; transition: background 0.2s;
+  }
+  .card-dropdown-item:hover { background: #fef2f2; }
+
+  .empty-state { text-align: center; padding: 50px 20px; }
+  .btn-new-room {
+    display: inline-block; margin-top: 16px; background: var(--primary); color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 14px; transition: all 0.2s;
+  }
+  .btn-new-room:hover { background: #0f172a; transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="/dashboard" class="brand-logo">⚡ ASINCRO</a>
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link">Página Principal</a>
+        <a href="/mis_salas" class="nav-link active">Mis Salas</a>
+        <a href="/otras_salas" class="nav-link">Otras Salas</a>
+      </div>
+    </div>
+    
+    <div class="nav-right">
+      <div class="profile-trigger" onclick="toggleDropdown()">
+        <img src="{{ user.picture }}" alt="Avatar" class="user-avatar-top">
+        <span class="notification-dot {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}"></span>
+        <span style="font-size: 13.5px; font-weight: 600; color: #fff;">{{ user.name.split(' ')[0] }} ▾</span>
+      </div>
+
+      <div class="dropdown-menu" id="profileDropdown">
+        <a href="/perfil" class="dropdown-item">👤 Perfil</a>
+        <a href="/mensajes" class="dropdown-item">
+          <span>💬 Mensajes</span>
+          <span class="dot-inline {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}"></span>
+        </a>
+        <a href="/logout" class="dropdown-item logout">🚪 Cerrar sesión</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <h1 class="page-heading">Mis Salas</h1>
+
+    <div class="outer-board">
+      <div class="board-header">Vista general de salas creadas por mí</div>
+
+      <div class="filter-bar">
+        <button class="filter-icon-btn" title="Filtro de carpetas">📂</button>
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar sala por nombre o código..." onkeyup="filtrarYOrdenarSalas()">
+        <select id="sortSelect" class="filter-select" onchange="filtrarYOrdenarSalas()">
+          <option value="az">Ordenar por: De la A a la Z</option>
+          <option value="hoy">Creado hoy</option>
+          <option value="semana">Creado última semana</option>
+          <option value="mes">Creado hace un mes</option>
+          <option value="anio">Creado hace un año</option>
+        </select>
+      </div>
+
+      {% if rooms %}
+      <div class="rooms-grid" id="roomsContainer">
+        {% for room in rooms %}
+        <div class="room-card" data-name="{{ room.nombre | lower }}" data-code="{{ room.codigo | lower }}" data-time="{{ room.creada_dt.timestamp() if room.creada_dt else 0 }}">
+          <a href="/sala/{{ room.codigo }}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
+            <div class="room-card-banner">
+              {% if room.foto %}
+              <img src="{{ room.foto }}" alt="{{ room.nombre }}">
+              {% endif %}
+            </div>
+            <div class="room-card-body">
+              <div>
+                <div class="room-card-title">{{ room.nombre }} - {{ room.codigo }}</div>
+                <div class="room-card-code">Líder de Sala • Creada el {{ room.creada }}</div>
+              </div>
+            </div>
+          </a>
+          
+          <div class="room-card-footer" style="padding: 10px 20px;">
+            <span>Capacidad: 1 / {{ room.limite }} usuarios</span>
+            
+            <!-- BOTÓN Y MENÚ DE TRES PUNTITOS -->
+            <div class="menu-dots-wrapper">
+              <button type="button" class="dots-btn" onclick="toggleCardMenu(event, 'menu-{{ room.codigo }}')">⋮</button>
+              <div class="card-dropdown-menu" id="menu-{{ room.codigo }}">
+                <form action="/eliminar_sala/{{ room.codigo }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta sala?');">
+                  <button type="submit" class="card-dropdown-item">🗑️ Eliminar sala</button>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div style="font-size: 40px; margin-bottom: 10px;">📂</div>
+        <h3 style="color: var(--primary); margin-bottom: 6px;">Aún no has creado ninguna sala grupal</h3>
+        <p style="font-size: 13px; color: var(--muted);">Las salas que crees aparecerán listadas automáticamente en esta sección.</p>
+        <a href="/crear_sala" class="btn-new-room">✨ Crear mi primera sala</a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+<script>
+  function toggleDropdown() {
+    document.getElementById('profileDropdown').classList.toggle('show');
+  }
+
+  function toggleCardMenu(event, menuId) {
+    event.stopPropagation();
+    // Cerrar otros menús abiertos
+    document.querySelectorAll('.card-dropdown-menu').forEach(m => {
+      if (m.id !== menuId) m.classList.remove('show');
+    });
+    const menu = document.getElementById(menuId);
+    menu.classList.toggle('show');
+  }
+
+  function filtrarYOrdenarSalas() {
+    const texto = document.getElementById('searchInput').value.toLowerCase().trim();
+    const orden = document.getElementById('sortSelect').value;
+    const container = document.getElementById('roomsContainer');
+    if (!container) return;
+
+    let cardsArray = Array.from(container.getElementsByClassName('room-card'));
+    const ahora = Date.now() / 1000;
+
+    cardsArray.forEach(card => {
+      const nombre = card.getAttribute('data-name');
+      const codigo = card.getAttribute('data-code');
+      const coincide = nombre.includes(texto) || codigo.includes(texto);
+      card.style.display = coincide ? 'flex' : 'none';
+    });
+
+    cardsArray.sort((a, b) => {
+      const nameA = a.getAttribute('data-name');
+      const nameB = b.getAttribute('data-name');
+      const timeA = parseFloat(a.getAttribute('data-time'));
+      const timeB = parseFloat(b.getAttribute('data-time'));
+
+      if (orden === 'az') {
+        return nameA.localeCompare(nameB);
+      } else if (orden === 'hoy') {
+        const diffA = Math.abs(ahora - timeA);
+        const diffB = Math.abs(ahora - timeB);
+        return diffA - diffB;
+      } else if (orden === 'semana' || orden === 'mes' || orden === 'anio') {
+        return timeB - timeA;
+      }
+      return 0;
+    });
+
+    cardsArray.forEach(card => container.appendChild(card));
+  }
+
+  window.onclick = function(event) {
+    // Cerrar menú de perfil
+    if (!event.target.closest('.nav-right')) {
+      const dropdown = document.getElementById('profileDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    }
+    // Cerrar menús de tarjetas
+    document.querySelectorAll('.card-dropdown-menu').forEach(m => m.classList.remove('show'));
+  }
+</script>
+</body>
+</html>

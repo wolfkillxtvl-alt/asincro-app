@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASINCRO - Unirse a Sala</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+  .navbar {
+    background: var(--primary); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 20px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .brand-logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .nav-link-top { color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; background: rgba(255,255,255,0.1); transition: all 0.2s; }
+  .nav-link-top:hover { background: rgba(255,255,255,0.22); }
+
+  .main-container { max-width: 900px; width: 100%; margin: 50px auto; padding: 0 20px; flex: 1; }
+  .page-heading { font-size: 28px; font-weight: 800; color: #111827; margin-bottom: 22px; }
+
+  .outer-board { background: #ffffff; border: 2px solid #cbd5e1; border-radius: 18px; padding: 30px; box-shadow: 0 6px 20px rgba(0,0,0,0.03); }
+  .board-header { font-size: 14px; font-weight: 700; color: var(--muted); padding-bottom: 14px; border-bottom: 2px solid #e2e8f0; margin-bottom: 25px; }
+
+  .form-group { margin-bottom: 25px; }
+  .form-label { font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 8px; display: block; }
+  .form-input { width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 15px; font-weight: 700; outline: none; transition: border-color 0.2s; }
+  .form-input:focus { border-color: #2563eb; }
+
+  .btn-submit {
+    background: var(--primary); color: #fff; border: none; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s; float: right;
+  }
+  .btn-submit:hover { background: #0f172a; transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="/dashboard" class="brand-logo">⚡ ASINCRO</a>
+    <a href="/dashboard" class="nav-link-top">← Volver al Panel Principal</a>
+  </nav>
+
+  <div class="main-container">
+    <h1 class="page-heading">Unirse a una sala grupal</h1>
+
+    <form action="/unirse_sala" method="POST" class="outer-board">
+      <div class="board-header">Introduce el código proporcionado por el líder de sala</div>
+
+      <div class="form-group">
+        <label class="form-label">Código de equipo</label>
+        <input type="text" name="codigo_equipo" class="form-input" placeholder="EJ. ASIN-1234-UC" required>
+      </div>
+
+      <div style="overflow: hidden; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+        <button type="submit" class="btn-submit">Unirse a la Sala</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

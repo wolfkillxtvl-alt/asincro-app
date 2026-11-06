@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">ASINCRO - Actividad Asíncrona</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* BARRA SUPERIOR AZUL CORPORATIVA */
+  .navbar {
+    background: var(--primary); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 20px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .nav-left { display: flex; align-items: center; gap: 30px; }
+  .brand-logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: var(--accent); display: flex; align-items: center; gap: 8px; text-decoration: none; transition: transform 0.2s; }
+  .brand-logo:hover { transform: scale(1.03); }
+  
+  .nav-links { display: flex; gap: 12px; }
+  .nav-link { 
+    color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 10px; font-size: 14.5px; font-weight: 600; 
+    background: rgba(255,255,255,0.08); transition: all 0.25s ease; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .nav-link:hover, .nav-link.active { 
+    background: rgba(255,255,255,0.22); transform: translateY(-2px); border-color: rgba(255,255,255,0.2); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .nav-link:active { transform: translateY(0); }
+
+  .nav-right { position: relative; display: flex; align-items: center; }
+  .profile-trigger { 
+    display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(255,255,255,0.1); padding: 6px 14px; 
+    border-radius: 999px; position: relative; user-select: none; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.1);
+  }
+  .profile-trigger:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+  .profile-trigger:active { transform: translateY(0); }
+  .user-avatar-top { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+  
+  .notification-dot {
+    position: absolute; top: 2px; right: 12px; width: 12px; height: 12px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; display: none;
+  }
+  .notification-dot.active { display: block; }
+  .dot-inline { display: none; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+  .dot-inline.active { display: inline-block; }
+
+  .dropdown-menu {
+    display: none; position: absolute; top: 58px; right: 0; background: #fff; color: var(--text); width: 250px;
+    border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; z-index: 100; border: 1px solid #e5e7eb;
+  }
+  .dropdown-menu.show { display: block; }
+  .dropdown-item {
+    padding: 13px 18px; font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f3f4f6; transition: all 0.2s; cursor: pointer;
+  }
+  .dropdown-item:hover { background: #f8fafc; color: #2563eb; transform: translateX(3px); }
+  .dropdown-item.logout { color: #ef4444; border-bottom: none; }
+  .dropdown-item.logout:hover { background: #fef2f2; color: #dc2626; }
+
+  .lang-selector-view { display: none; }
+  .lang-selector-header {
+    padding: 14px 18px; font-size: 14px; font-weight: 700; color: var(--text); border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; gap: 12px; cursor: pointer; background: #fff;
+  }
+  .lang-selector-header:hover { background: #f8fafc; color: #2563eb; }
+  .lang-list { max-height: 240px; overflow-y: auto; }
+  .lang-option {
+    padding: 11px 18px; font-size: 13.5px; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .lang-option:hover { background: #f8fafc; color: #2563eb; transform: translateX(3px); }
+  .lang-check { width: 16px; font-weight: 800; color: var(--text); text-align: center; }
+
+  .main-container { max-width: 1200px; width: 100%; margin: 35px auto; padding: 0 20px; flex: 1; }
+
+  .header-section { margin-bottom: 25px; }
+  .header-title { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+  .header-welcome { font-size: 18px; font-weight: 600; color: var(--text); }
+
+  /* BANNER AMPLIADO Y FLUIDO */
+  .banner-container {
+    position: relative; width: 100%; height: 450px; border-radius: 20px; overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 40px; background: #111;
+  }
+  .banner-slide {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover; background-position: center; opacity: 0; 
+    transform: translateX(100%); transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+    display: flex; align-items: center; padding: 0 60px;
+  }
+  .banner-slide.active { opacity: 1; transform: translateX(0); z-index: 2; }
+  .banner-slide.previous { transform: translateX(-100%); opacity: 0; z-index: 1; }
+
+  .banner-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.6) 100%); }
+  .banner-content { position: relative; z-index: 3; color: #fff; max-width: 750px; }
+  .banner-content h2 { font-size: 36px; font-weight: 800; margin-bottom: 12px; color: var(--accent); }
+  .banner-content p { font-size: 16px; line-height: 1.6; color: #e2e8f0; }
+
+  .section-title { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+  .section-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-bottom: 40px; }
+  
+  /* TARJETAS INTERACTIVAS CON HOVER Y ACTIVE SUAVE */
+  .card-item {
+    background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 2px solid #cbd5e1; display: flex; align-items: flex-start; gap: 16px; cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; color: inherit;
+  }
+  .card-item:hover { transform: translateY(-4px) scale(1.01); border-color: #2563eb; box-shadow: 0 10px 25px rgba(37,99,235,0.1); }
+  .card-item:active { transform: translateY(-1px) scale(0.99); }
+  
+  .card-icon {
+    width: 48px; height: 48px; border-radius: 12px; background: #e0f2fe; color: #0284c7;
+    display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .card-item:hover .card-icon { transform: scale(1.1) rotate(5deg); }
+
+  .card-info h4 { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+  .card-info p { font-size: 13px; color: var(--muted); line-height: 1.4; }
+
+  /* FOOTER OSCURO */
+  .footer-dark {
+    background: #090d16;
+    color: #94a3b8;
+    padding: 35px 40px;
+    text-align: center;
+    border-top: 2px solid #1e293b;
+    margin-top: auto;
+  }
+  .footer-logo-text { font-size: 20px; font-weight: 900; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="/dashboard" class="brand-logo">⚡ ASINCRO</a>
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link active" id="navHome">Página Principal</a>
+        <a href="/mis_salas" class="nav-link" id="navRooms">Mis Salas</a>
+        <a href="/otras_salas" class="nav-link" id="navOtherRooms">Otras Salas</a>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <div class="profile-trigger" onclick="toggleDropdown()">
+        <img src="{{ user.picture }}" alt="Avatar" class="user-avatar-top">
+        <span class="notification-dot {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}" id="imgDot"></span>
+        <span style="font-size: 13.5px; font-weight: 600; color: #fff;">{{ user.name.split(' ')[0] }} ▾</span>
+      </div>
+
+      <div class="dropdown-menu" id="profileDropdown">
+        <div id="mainMenuView">
+          <a href="/perfil" class="dropdown-item" id="mPerfil">👤 Perfil</a>
+          <div class="dropdown-item" id="mMensajes" onclick="checkMessages(event)">
+            <span id="mMsgText">💬 Mensajes</span>
+            <span class="dot-inline {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}" id="msgDot"></span>
+          </div>
+          <div class="dropdown-item" onclick="openLangSelector(event)">
+            <span id="mIdiomaText">🌐 Idioma</span>
+            <span style="font-size: 12px; color: var(--muted);">▸</span>
+          </div>
+          <a href="/logout" class="dropdown-item logout" id="mSalir">🚪 Cerrar sesión</a>
+        </div>
+
+        <div id="langSelectorView" class="lang-selector-view">
+          <div class="lang-selector-header" onclick="closeLangSelector(event)">
+            <span style="font-size: 16px;">←</span>
+            <span id="langHeaderTitle">Selector de idioma</span>
+          </div>
+          <div class="lang-list">
+            <div class="lang-option" onclick="changeLanguage('en')"><span class="lang-check" id="check_en"></span><span>English (en)</span></div>
+            <div class="lang-option" onclick="changeLanguage('en_us')"><span class="lang-check" id="check_en_us"></span><span>English (United States) (en_us)</span></div>
+            <div class="lang-option" onclick="changeLanguage('es')"><span class="lang-check" id="check_es">✓</span><span>Español - Internacional (es)</span></div>
+            <div class="lang-option" onclick="changeLanguage('pt')"><span class="lang-check" id="check_pt"></span><span>Português - Brasil (pt)</span></div>
+            <div class="lang-option" onclick="changeLanguage('fr')"><span class="lang-check" id="check_fr"></span><span>Français (fr)</span></div>
+            <div class="lang-option" onclick="changeLanguage('it')"><span class="lang-check" id="check_it"></span><span>Italiano (it)</span></div>
+            <div class="lang-option" onclick="changeLanguage('de')"><span class="lang-check" id="check_de"></span><span>Deutsch (de)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <div class="header-section">
+      <div class="header-title" id="mainTitle">Actividad Asíncrona</div>
+      <div class="header-welcome" id="welcomeText">¡Hola, {{ user.name | upper }}! 👋</div>
+    </div>
+
+    <div class="banner-container">
+      <div class="banner-slide active" style="background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80');">
+        <div class="banner-overlay"></div>
+        <div class="banner-content"><h2 id="slide1Title">Gestión de Proyectos ABR 2026</h2><p id="slide1Desc">Coordina el desarrollo de tus modelos de negocio de forma eficiente y colaborativa.</p></div>
+      </div>
+      <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80');">
+        <div class="banner-overlay"></div>
+        <div class="banner-content"><h2 id="slide2Title">Trabajo en Equipo sin Límites</h2><p id="slide2Desc">Crea salas grupales, comparte códigos de acceso y sincroniza comentarios en tiempo real.</p></div>
+      </div>
+      <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80');">
+        <div class="banner-overlay"></div>
+        <div class="banner-content"><h2 id="slide3Title">Innovación y Tecnología Asíncrona</h2><p id="slide3Desc">Optimiza la entrega de tus actividades académicas universitarias.</p></div>
+      </div>
+      <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80');">
+        <div class="banner-overlay"></div>
+        <div class="banner-content"><h2 id="slide4Title">Sinergia Universitaria</h2><p id="slide4Desc">Conéctate con tus compañeros de clase y asegura el éxito de tus entregas.</p></div>
+      </div>
+      <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80');">
+        <div class="banner-overlay"></div>
+        <div class="banner-content"><h2 id="slide5Title">Productividad sin Fronteras</h2><p id="slide5Desc">Tu espacio centralizado para la co-creación y el seguimiento académico.</p></div>
+      </div>
+    </div>
+
+    <div class="section-title" id="secResourcesTitle">Recursos Asíncronos</div>
+    <div class="section-subtitle" id="secResourcesSub">Accede al panel principal de herramientas de colaboración y gestión de equipos.</div>
+
+    <div class="grid-cards">
+      <a href="/crear_sala" class="card-item">
+        <div class="card-icon">✨</div>
+        <div class="card-info"><h4 id="card1Title">Crear sala grupal</h4><p id="card1Desc">Genera un código único para tu equipo de trabajo y sé el líder de sala.</p></div>
+      </a>
+      <a href="/unirse_sala" class="card-item">
+        <div class="card-icon">🔗</div>
+        <div class="card-info"><h4 id="card2Title">Unirse a una sala grupal</h4><p id="card2Desc">Introduce el código de sala proporcionado por tu equipo y sincroniza tus avances.</p></div>
+      </a>
+      <a href="/soporte" class="card-item">
+        <div class="card-icon">🛠️</div>
+        <div class="card-info"><h4 id="card3Title">Soporte técnico</h4><p id="card3Desc">Consulta soluciones, tutoriales y canales de atención rápida.</p></div>
+      </a>
+    </div>
+  </div>
+
+  <footer class="footer-dark">
+    <span class="footer-logo-text">⚡ ASINCRO</span>
+    <p style="font-size: 12.5px; margin-top: 6px; color: #64748b;">© 2026 ASINCRO • Todos los derechos reservados</p>
+  </footer>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.banner-slide');
+  function nextSlide() {
+    slides[currentSlide].className = 'banner-slide previous';
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].className = 'banner-slide active';
+  }
+  setInterval(nextSlide, 5000);
+
+  function toggleDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    dropdown.classList.toggle('show');
+    document.getElementById('mainMenuView').style.display = 'block';
+    document.getElementById('langSelectorView').style.display = 'none';
+  }
+
+  function openLangSelector(event) {
+    event.stopPropagation();
+    document.getElementById('mainMenuView').style.display = 'none';
+    document.getElementById('langSelectorView').style.display = 'block';
+  }
+
+  function closeLangSelector(event) {
+    event.stopPropagation();
+    document.getElementById('langSelectorView').style.display = 'none';
+    document.getElementById('mainMenuView').style.display = 'block';
+  }
+
+  const translations = {
+    es: {
+      home: "Página Principal", rooms: "Mis Salas", otherRooms: "Otras Salas", profile: "👤 Perfil",
+      msg: "💬 Mensajes", lang: "🌐 Idioma", salir: "🚪 Cerrar sesión", langHeader: "Selector de idioma",
+      title: "Actividad Asíncrona", welcome: "¡Hola, {{ user.name | upper }}! 👋",
+      s1t: "Gestión de Proyectos ABR 2026", s1d: "Coordina el desarrollo de tus modelos de negocio de forma eficiente y colaborativa.",
+      s2t: "Trabajo en Equipo sin Límites", s2d: "Crea salas grupales, comparte códigos de acceso y sincroniza comentarios en tiempo real.",
+      s3t: "Innovación y Tecnología Asíncrona", s3d: "Optimiza la entrega de tus actividades académicas universitarias.",
+      s4t: "Sinergia Universitaria", s4d: "Conéctate con tus compañeros de clase y asegura el éxito de tus entregas.",
+      s5t: "Productividad sin Fronteras", s5d: "Tu espacio centralizado para la co-creación y el seguimiento académico.",
+      resTitle: "Recursos Asíncronos", resSub: "Accede al panel principal de herramientas de colaboración y gestión de equipos.",
+      c1t: "Crear sala grupal", c1d: "Genera un código único para tu equipo de trabajo y sé el líder de sala.",
+      c2t: "Unirse a una sala grupal", c2d: "Introduce el código de sala proporcionado por tu equipo y sincroniza tus avances.",
+      c3t: "Soporte técnico", c3d: "Consulta soluciones, tutoriales y canales de atención rápida.",
+      incompleteMsg: "Falta completar datos de usuario/perfil, por favor complete sus datos en la sección perfil."
+    },
+    en: {
+      home: "Home", rooms: "My Rooms", otherRooms: "Other Rooms", profile: "👤 Profile",
+      msg: "💬 Messages", lang: "🌐 Language", salir: "🚪 Log out", langHeader: "Language selector",
+      title: "Asynchronous Activity", welcome: "Hello, {{ user.name | upper }}! 👋",
+      s1t: "ABR Project Management 2026", s1d: "Coordinate your business model development efficiently and collaboratively.",
+      s2t: "Limitless Teamwork", s2d: "Create group rooms, share access codes, and sync comments in real-time.",
+      s3t: "Asynchronous Innovation & Tech", s3d: "Optimize your university academic assignments delivery.",
+      s4t: "University Synergy", s4d: "Connect with classmates and ensure successful group submissions.",
+      s5t: "Productivity Without Borders", s5d: "Your centralized space for co-creation and academic tracking.",
+      resTitle: "Asynchronous Resources", resSub: "Access main collaboration and team management tools.",
+      c1t: "Create group room", c1d: "Generate a unique code for your team and become the room leader.",
+      c2t: "Join a group room", c2d: "Enter the room code provided by your team and sync your progress.",
+      c3t: "Technical support", c3d: "Check solutions, tutorials, and quick support channels.",
+      incompleteMsg: "User/profile data is incomplete, please complete your details in the profile section."
+    },
+    pt: {
+      home: "Página Principal", rooms: "Minhas Salas", otherRooms: "Outras Salas", profile: "👤 Perfil",
+      msg: "💬 Mensagens", lang: "🌐 Idioma", salir: "🚪 Sair", langHeader: "Seletor de idioma",
+      title: "Atividade Assíncrona", welcome: "Olá, {{ user.name | upper }}! 👋",
+      s1t: "Gestão de Projetos ABR 2026", s1d: "Coordene o desenvolvimento dos seus modelos de negócio com eficiência.",
+      s2t: "Trabalho em Equipe sem Limites", s2d: "Crie salas de grupo, compartilhe códigos e sincronice comentários.",
+      s3t: "Inovação e Tecnologia Assíncrona", s3d: "Otimize a entrega das suas atividades acadêmicas.",
+      s4t: "Sinergia Universitária", s4d: "Conecte-se com colegas e garanta o sucesso das entregas.",
+      s5t: "Produtividade Sem Fronteiras", s5d: "Seu espaço centralizado para co-criação e acompanhamento.",
+      resTitle: "Recursos Assíncronos", resSub: "Acesse as principais ferramentas de colaboração e gestão.",
+      c1t: "Criar sala de grupo", c1d: "Gere um código exclusivo para sua equipe e seja o líder.",
+      c2t: "Entrar em sala de grupo", c2d: "Insira o código da sala fornecido pela sua equipe.",
+      c3t: "Suporte técnico", c3d: "Consulte soluções, tutoriais e canais de atendimento.",
+      incompleteMsg: "Faltam dados de perfil, por favor complete seus dados na seção de perfil."
+    },
+    fr: {
+      home: "Page Principale", rooms: "Mes Salles", otherRooms: "Autres Salles", profile: "👤 Profil",
+      msg: "💬 Messages", lang: "🌐 Langue", salir: "🚪 Déconnexion", langHeader: "Sélecteur de langue",
+      title: "Activité Asynchrone", welcome: "Bonjour, {{ user.name | upper }} ! 👋",
+      s1t: "Gestion de Projets ABR 2026", s1d: "Coordonnez le développement de vos modèles commerciaux efficacement.",
+      s2t: "Travail d'Équipe sans Limites", s2d: "Créez des salles de groupe et synchronisez vos commentaires.",
+      s3t: "Innovation et Technologie Asynchrone", s3d: "Optimisez la remise de vos devoirs académiques.",
+      s4t: "Synergie Universitaire", s4d: "Connectez-vous avec vos camarades et assurez la réussite.",
+      s5t: "Productivité sans Frontières", s5d: "Votre espace centralisé pour la co-création et le suivi.",
+      resTitle: "Ressources Asynchrones", resSub: "Accédez aux principaux outils de collaboration.",
+      c1t: "Créer une salle de groupe", c1d: "Générez un code unique pour votre équipe et soyez le leader.",
+      c2t: "Rejoindre une salle de groupe", c2d: "Entrez le code de salle fourni par votre équipe.",
+      c3t: "Support technique", c3d: "Consultez des solutions et des tutoriels.",
+      incompleteMsg: "Données de profil incomplètes, veuillez compléter vos informations dans la section profil."
+    },
+    it: {
+      home: "Pagina Principale", rooms: "Le mie stanze", otherRooms: "Altre Stanze", profile: "👤 Profilo",
+      msg: "💬 Messaggi", lang: "🌐 Lingua", salir: "🚪 Esci", langHeader: "Selettore lingua",
+      title: "Attività Asincrona", welcome: "Ciao, {{ user.name | upper }}! 👋",
+      s1t: "Gestione Progetti ABR 2026", s1d: "Coordina lo sviluppo dei tuoi modelli di business in modo efficiente.",
+      s2t: "Lavoro di Squadra Senza Limiti", s2d: "Crea stanze di gruppo e sincronizza i commenti in tempo reale.",
+      s3t: "Innovazione e Tecnologia Asincrona", s3d: "Ottimizza la consegna delle tue attività accademiche.",
+      s4t: "Sinergia Universitaria", s4d: "Connettiti con i compagni di classe e assicurati il successo.",
+      s5t: "Produttività Senza Frontiere", s5d: "Il tuo spazio centralizzato per la co-creazione.",
+      resTitle: "Risorse Asincrone", resSub: "Accedi ai principali strumenti di collaborazione.",
+      c1t: "Crea stanza di gruppo", c1d: "Genera un codice univoco per il tuo team e sii il leader.",
+      c2t: "Unisciti a una stanza di gruppo", c2d: "Inserisci il codice della stanza fornito dal tuo team.",
+      c3t: "Supporto tecnico", c3d: "Consulta soluzioni e tutorial rapidi.",
+      incompleteMsg: "Dati profilo incompleti, si prega di completare i dati nella sezione profilo."
+    },
+    de: {
+      home: "Hauptseite", rooms: "Meine Räume", otherRooms: "Andere Räume", profile: "👤 Profil",
+      msg: "💬 Nachrichten", lang: "🌐 Sprache", salir: "🚪 Abmelden", langHeader: "Sprachauswahl",
+      title: "Asynchrone Aktivität", welcome: "Hallo, {{ user.name | upper }}! 👋",
+      s1t: "ABR Projektmanagement 2026", s1d: "Koordinieren Sie die Entwicklung Ihrer Geschäftsmodelle effizient.",
+      s2t: "Grenzenlose Teamarbeit", s2d: "Erstellen Sie Gruppenräume und synchronisieren Sie Kommentare.",
+      s3t: "Asynchrone Innovation & Tech", s3d: "Optimieren Sie die Abgabe Ihrer akademischen Aufgaben.",
+      s4t: "Universitäre Synergie", s4d: "Vernetzen Sie sich mit Kommilitonen und sichern Sie den Erfolg.",
+      s5t: "Produktivität ohne Grenzen", s5d: "Ihr zentraler Ort für Co-Creation und Tracking.",
+      resTitle: "Asynchrone Ressourcen", resSub: "Greifen Sie auf wichtige Tools zur Zusammenarbeit zu.",
+      c1t: "Gruppenraum erstellen", c1d: "Generieren Sie einen eindeutigen Code für Ihr Team.",
+      c2t: "Gruppenraum beitreten", c2d: "Geben Sie den Raumcode ein, den Ihr Team bereitgestellt hat.",
+      c3t: "Technischer Support", c3d: "Konsultieren Sie schnelle Lösungen und Tutorials.",
+      incompleteMsg: "Profil-Daten unvollständig, bitte ergänzen Sie Ihre Daten im Profilbereich."
+    }
+  };
+  translations.en_us = translations.en;
+
+  function t(key) {
+    const lang = localStorage.getItem('asincro_lang') || 'es';
+    const dict = translations[lang] || translations['es'];
+    return dict[key] || translations['es'][key];
+  }
+
+  function changeLanguage(lang) {
+    localStorage.setItem('asincro_lang', lang);
+    applyTranslations(lang);
+    document.getElementById('profileDropdown').classList.remove('show');
+  }
+
+  function applyTranslations(lang) {
+    const tr = translations[lang] || translations['es'];
+    
+    document.getElementById('navHome').textContent = tr.home;
+    document.getElementById('navRooms').textContent = tr.rooms;
+    document.getElementById('navOtherRooms').textContent = tr.otherRooms;
+    document.getElementById('mPerfil').innerHTML = tr.profile;
+    document.getElementById('mMsgText').innerHTML = tr.msg;
+    document.getElementById('mIdiomaText').innerHTML = tr.lang;
+    document.getElementById('mSalir').innerHTML = tr.salir;
+    document.getElementById('langHeaderTitle').textContent = tr.langHeader;
+
+    document.getElementById('mainTitle').textContent = tr.title;
+    document.getElementById('welcomeText').innerHTML = tr.welcome;
+
+    document.getElementById('slide1Title').textContent = tr.s1t;
+    document.getElementById('slide1Desc').textContent = tr.s1d;
+    document.getElementById('slide2Title').textContent = tr.s2t;
+    document.getElementById('slide2Desc').textContent = tr.s2d;
+    document.getElementById('slide3Title').textContent = tr.s3t;
+    document.getElementById('slide3Desc').textContent = tr.s3d;
+    document.getElementById('slide4Title').textContent = tr.s4t;
+    document.getElementById('slide4Desc').textContent = tr.s4d;
+    document.getElementById('slide5Title').textContent = tr.s5t;
+    document.getElementById('slide5Desc').textContent = tr.s5d;
+
+    document.getElementById('secResourcesTitle').textContent = tr.resTitle;
+    document.getElementById('secResourcesSub').textContent = tr.resSub;
+
+    document.getElementById('card1Title').textContent = tr.c1t;
+    document.getElementById('card1Desc').textContent = tr.c1d;
+    document.getElementById('card2Title').textContent = tr.c2t;
+    document.getElementById('card2Desc').textContent = tr.c2d;
+    document.getElementById('card3Title').textContent = tr.c3t;
+    document.getElementById('card3Desc').textContent = tr.c3d;
+
+    ['en', 'en_us', 'es', 'pt', 'fr', 'it', 'de'].forEach(l => {
+      const check = document.getElementById('check_' + l);
+      if (check) check.textContent = (l === lang) ? '✓' : '';
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('asincro_lang') || 'es';
+    applyTranslations(savedLang);
+  });
+
+  function checkMessages(event) {
+    event.preventDefault();
+    const pais = "{{ user.pais }}";
+    const ciudad = "{{ user.ciudad }}";
+    const ciepais = "{{ user.ciepais }}";
+
+    if (!pais || !pais.trim() || !ciudad || !ciudad.trim() || !ciepais || !ciepais.trim()) {
+      alert(t('incompleteMsg'));
+    } else {
+      window.location.href = '/mensajes';
+    }
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.closest('.nav-right')) {
+      document.getElementById('profileDropdown').classList.remove('show');
+    }
+  }
+</script>
+</body>
+</html>

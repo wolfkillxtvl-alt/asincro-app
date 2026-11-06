@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASINCRO - Otras Salas</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+  .navbar {
+    background: var(--primary); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 20px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .nav-left { display: flex; align-items: center; gap: 30px; }
+  .brand-logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: var(--accent); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  
+  .nav-links { display: flex; gap: 12px; }
+  .nav-link { color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 10px; font-size: 14.5px; font-weight: 600; background: rgba(255,255,255,0.08); transition: all 0.25s ease; border: 1px solid rgba(255,255,255,0.05); }
+  .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.22); transform: translateY(-2px); border-color: rgba(255,255,255,0.2); }
+
+  .nav-right { position: relative; display: flex; align-items: center; }
+  .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 999px; position: relative; user-select: none; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.1); }
+  .profile-trigger:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+  .user-avatar-top { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+  
+  .notification-dot { position: absolute; top: 2px; right: 12px; width: 12px; height: 12px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; display: none; }
+  .notification-dot.active { display: block; }
+  .dot-inline { display: none; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+  .dot-inline.active { display: inline-block; }
+
+  .dropdown-menu {
+    display: none; position: absolute; top: 58px; right: 0; background: #fff; color: var(--text); width: 250px;
+    border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; z-index: 100; border: 1px solid #e5e7eb;
+  }
+  .dropdown-menu.show { display: block; }
+  .dropdown-item {
+    padding: 13px 18px; font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f3f4f6; transition: all 0.2s; cursor: pointer;
+  }
+  .dropdown-item:hover { background: #f8fafc; color: #2563eb; transform: translateX(3px); }
+  .dropdown-item.logout { color: #ef4444; border-bottom: none; }
+  .dropdown-item.logout:hover { background: #fef2f2; color: #dc2626; }
+
+  .main-container { max-width: 1200px; width: 100%; margin: 35px auto; padding: 0 20px; flex: 1; }
+  .page-heading { font-size: 28px; font-weight: 800; color: #111827; margin-bottom: 18px; }
+
+  .outer-board { background: #ffffff; border: 2px solid #cbd5e1; border-radius: 18px; padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.03); }
+  .board-header { font-size: 15px; font-weight: 700; color: #111827; padding-bottom: 14px; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+
+  .empty-state { text-align: center; padding: 50px 20px; }
+  .btn-join {
+    display: inline-block; margin-top: 16px; background: var(--primary); color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 14px; transition: all 0.2s;
+  }
+  .btn-join:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+  .room-card {
+    background: #ffffff; border: 2px solid #cbd5e1; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; color: inherit;
+  }
+  .room-card:hover { transform: translateY(-4px); border-color: #2563eb; box-shadow: 0 10px 25px rgba(37,99,235,0.1); }
+  .room-card-banner { height: 140px; width: 100%; background: linear-gradient(135deg, #475569 0%, #1e293b 100%); border-bottom: 2px solid #e2e8f0; overflow: hidden; }
+  .room-card-banner img { width: 100%; height: 100%; object-fit: cover; }
+  .room-card-body { padding: 18px 20px; display: flex; flex-direction: column; flex: 1; justify-content: space-between; }
+  .room-card-title { font-size: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; text-decoration: underline; margin-bottom: 6px; }
+  .room-card-code { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 18px; }
+  .room-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); font-weight: 600; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+</style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="/dashboard" class="brand-logo">⚡ ASINCRO</a>
+      <div class="nav-links">
+        <a href="/dashboard" class="nav-link">Página Principal</a>
+        <a href="/mis_salas" class="nav-link">Mis Salas</a>
+        <a href="/otras_salas" class="nav-link active">Otras Salas</a>
+      </div>
+    </div>
+    
+    <div class="nav-right">
+      <div class="profile-trigger" onclick="toggleDropdown()">
+        <img src="{{ user.picture }}" alt="Avatar" class="user-avatar-top">
+        <span class="notification-dot {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}"></span>
+        <span style="font-size: 13.5px; font-weight: 600; color: #fff;">{{ user.name.split(' ')[0] }} ▾</span>
+      </div>
+
+      <div class="dropdown-menu" id="profileDropdown">
+        <a href="/perfil" class="dropdown-item">👤 Perfil</a>
+        <a href="/mensajes" class="dropdown-item">
+          <span>💬 Mensajes</span>
+          <span class="dot-inline {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}"></span>
+        </a>
+        <a href="/logout" class="dropdown-item logout">🚪 Cerrar sesión</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <h1 class="page-heading">Otras Salas</h1>
+
+    <div class="outer-board">
+      <div class="board-header">Salas a las que me he unido mediante código</div>
+
+      {% if rooms %}
+      <div class="rooms-grid">
+        {% for room in rooms %}
+        <a href="/sala/{{ room.codigo }}" class="room-card">
+          <div class="room-card-banner">
+            {% if room.foto %}
+            <img src="{{ room.foto }}" alt="{{ room.nombre }}">
+            {% endif %}
+          </div>
+          <div class="room-card-body">
+            <div>
+              <div class="room-card-title">{{ room.nombre }} - {{ room.codigo }}</div>
+              <div class="room-card-code">Líder: {{ room.lider }} • Creada el {{ room.creada }}</div>
+            </div>
+            <div class="room-card-footer">
+              <span>Código: {{ room.codigo }}</span>
+              <span style="font-size: 16px; color: #111;">⋮</span>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div style="font-size: 40px; margin-bottom: 10px;">🔗</div>
+        <h3 style="color: var(--primary); margin-bottom: 6px;">Aún no te has unido a ninguna sala externa</h3>
+        <p style="font-size: 13px; color: var(--muted);">Introduce el código proporcionado por tu equipo para unirte.</p>
+        <a href="/unirse_sala" class="btn-join">🔗 Unirme a una sala</a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+<script>
+  function toggleDropdown() {
+    document.getElementById('profileDropdown').classList.toggle('show');
+  }
+  window.onclick = function(event) {
+    if (!event.target.closest('.nav-right')) {
+      const dropdown = document.getElementById('profileDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    }
+  }
+</script>
+</body>
+</html>

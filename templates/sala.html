@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASINCRO - Sala {{ room.nombre }}</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+  .navbar {
+    background: var(--primary); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 20px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .nav-left { display: flex; align-items: center; gap: 20px; }
+  .brand-logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  
+  .nav-links { display: flex; gap: 8px; }
+  .nav-link { color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 10px; font-size: 14.5px; font-weight: 600; background: rgba(255,255,255,0.08); transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05); }
+  .nav-link:hover { background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+
+  .nav-right { position: relative; display: flex; align-items: center; gap: 15px; }
+  .btn-regresar-top {
+    color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+    background: rgba(255,255,255,0.1); transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .btn-regresar-top:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+
+  .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 999px; position: relative; user-select: none; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); }
+  .profile-trigger:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+  .user-avatar-top { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+  
+  .notification-dot { position: absolute; top: 2px; right: 12px; width: 12px; height: 12px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; display: none; }
+  .notification-dot.active { display: block; }
+  .dot-inline { display: none; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+  .dot-inline.active { display: inline-block; }
+
+  .dropdown-menu {
+    display: none; position: absolute; top: 58px; right: 0; background: #fff; color: var(--text); width: 250px;
+    border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; z-index: 100; border: 1px solid #e5e7eb;
+  }
+  .dropdown-menu.show { display: block; }
+  .dropdown-item {
+    padding: 13px 18px; font-size: 14px; font-weight: 600; color: var(--text); text-decoration: none; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f3f4f6; transition: all 0.2s; cursor: pointer;
+  }
+  .dropdown-item:hover { background: #f8fafc; color: #2563eb; transform: translateX(3px); }
+  .dropdown-item.logout { color: #ef4444; border-bottom: none; }
+  .dropdown-item.logout:hover { background: #fef2f2; color: #dc2626; }
+
+  .layout-container { display: flex; flex: 1; max-width: 1450px; width: 100%; margin: 35px auto; padding: 0 20px; gap: 25px; }
+  .sidebar-left { width: 310px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; }
+  
+  /* PANEL DERECHO */
+  .sidebar-right { width: 310px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; }
+  .team-status-title { font-size: 14px; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+  
+  .user-status-card { background: #ffffff; border: 2px solid #cbd5e1; border-radius: 16px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 10px; transition: all 0.2s; }
+  .user-status-card:hover { border-color: #94a3b8; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+  .usc-header { display: flex; align-items: center; gap: 10px; }
+  .usc-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+  .usc-name { font-size: 13.5px; font-weight: 800; color: var(--text); }
+  .usc-time { font-size: 10.5px; color: var(--muted); }
+  .usc-comment { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 10px; font-size: 13px; color: var(--text); word-break: break-word; }
+  .usc-progress-bar { background: #e2e8f0; border-radius: 999px; height: 8px; width: 100%; overflow: hidden; margin-top: 4px; }
+  .usc-progress-fill { height: 100%; background: #2563eb; transition: width 0.4s ease; }
+  
+  .usc-file-download { margin-top: 4px; padding: 6px 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; text-decoration: none; color: #1e40af; }
+  .usc-file-download:hover { background: #dbeafe; }
+
+  .team-analytics-box { background: #ffffff; border: 2px solid var(--primary); border-radius: 16px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 14px; margin-top: 5px; }
+  .analytics-section { display: flex; flex-direction: column; gap: 6px; }
+  .analytics-label { font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+  .analytics-bar-bg { background: #e2e8f0; border-radius: 999px; height: 10px; width: 100%; overflow: hidden; }
+  .analytics-bar-fill { height: 100%; transition: width 0.4s ease, background-color 0.4s ease; }
+
+  /* GRILLA DE EMOTICONOS CON NOMBRE */
+  .emojis-grid-named { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .emoji-card-btn {
+    padding: 8px 4px; border: 2px solid #cbd5e1; border-radius: 10px; background: #fff; cursor: pointer; text-align: center; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .emoji-card-btn:hover { background: #f1f5f9; }
+  .emoji-card-btn.selected { border-color: #2563eb; background: #eff6ff; transform: scale(1.03); }
+  .emoji-symbol { font-size: 18px; }
+  .emoji-name { font-size: 10px; font-weight: 800; color: var(--primary); }
+
+  /* MODAL CUESTIONARIO */
+  .quiz-modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6);
+    z-index: 2000; justify-content: center; align-items: center; padding: 20px;
+  }
+  .quiz-modal.show { display: flex; }
+  .quiz-container {
+    background: #fff; width: 100%; max-width: 650px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; animation: zoomIn 0.3s ease;
+  }
+  @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .quiz-header { background: var(--primary); color: #fff; padding: 20px 25px; font-size: 18px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
+  .quiz-body { padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  .quiz-question { font-size: 14.5px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-option-label { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 8px; background: #f8fafc; border: 1.5px solid #e2e8f0; transition: background 0.2s; }
+  .quiz-option-label:hover { background: #e2e8f0; }
+
+  .panel-box { background: #ffffff; border: 2px solid #cbd5e1; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+  .panel-header {
+    background: var(--primary); color: #fff; padding: 14px 18px; font-size: 14px; font-weight: 800; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; user-select: none;
+  }
+  .panel-body { padding: 16px; }
+  
+  .members-list { max-height: 240px; overflow-y: auto; }
+  .member-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+  .member-info-left { display: flex; align-items: center; gap: 10px; position: relative; }
+  .member-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+  .member-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  
+  .private-badge-dot { position: absolute; top: 0; left: 24px; width: 10px; height: 10px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; display: none; }
+  .private-badge-dot.active { display: block; }
+
+  .btn-private-chat {
+    background: #e0f2fe; color: #0284c7; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-private-chat:hover { background: #bae6fd; transform: translateY(-1px); }
+
+  /* CHAT PRIVADO FLOTANTE */
+  .chat-modal {
+    display: none; position: fixed; bottom: 20px; right: 20px; width: 360px; height: 480px; 
+    background: #fff; border-radius: 20px; box-shadow: 0 15px 35px rgba(15, 23, 42, 0.25); 
+    z-index: 1000; overflow: hidden; flex-direction: column; animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .chat-modal.show { display: flex; }
+  
+  .chat-header { 
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; padding: 16px 20px; 
+    font-size: 14.5px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 2px solid #334155;
+  }
+  .chat-close { background: rgba(255,255,255,0.1); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+  .chat-close:hover { background: rgba(255,255,255,0.25); }
+
+  .chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: #f8fafc; display: flex; flex-direction: column; gap: 12px; }
+  .chat-bubble-container { display: flex; flex-direction: column; max-width: 82%; }
+  .chat-bubble-container.sent { align-self: flex-end; align-items: flex-end; }
+  .chat-bubble-container.received { align-self: flex-start; align-items: flex-start; }
+
+  .chat-bubble { padding: 10px 14px; border-radius: 14px; line-height: 1.4; word-break: break-word; font-size: 13.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+  .chat-bubble.sent { background: #2563eb; color: #fff; border-bottom-right-radius: 3px; }
+  .chat-bubble.received { background: #ffffff; color: var(--text); border: 1.5px solid #e2e8f0; border-bottom-left-radius: 3px; }
+  .chat-time { font-size: 10px; color: var(--muted); margin-top: 3px; padding: 0 4px; }
+  .chat-file-preview { margin-top: 6px; padding: 8px 12px; background: rgba(0,0,0,0.06); border-radius: 8px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; text-decoration: none; color: inherit; }
+  .chat-file-preview img { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; }
+
+  /* INDICADOR ESCRIBIENDO CHAT PRIVADO */
+  .typing-indicator { display: none; align-self: flex-start; background: #ffffff; border: 1.5px solid #e2e8f0; padding: 10px 14px; border-radius: 14px; gap: 5px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+  .typing-indicator.show { display: flex; }
+
+  /* CHAT GRUPAL EN VIVO */
+  .group-chat-card { 
+    background: #ffffff; border: 2px solid #cbd5e1; border-radius: 20px; margin-top: 25px; 
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); display: flex; flex-direction: column; height: 460px; overflow: hidden; 
+  }
+  .group-chat-header { 
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; padding: 18px 22px; 
+    font-size: 15.5px; font-weight: 900; display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px;
+  }
+  .group-chat-messages { flex: 1; overflow-y: auto; padding: 22px; background: #f8fafc; display: flex; flex-direction: column; gap: 16px; }
+  
+  .group-msg-row { display: flex; gap: 12px; max-width: 80%; }
+  .group-msg-row.sent { align-self: flex-end; flex-direction: row-reverse; }
+  .group-msg-row.received { align-self: flex-start; }
+  
+  .group-msg-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+  .group-msg-content { display: flex; flex-direction: column; }
+  .group-msg-row.sent .group-msg-content { align-items: flex-end; }
+  
+  .group-msg-author { font-size: 12px; font-weight: 800; color: #475569; margin-bottom: 4px; }
+  .group-msg-bubble { padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.45; word-break: break-word; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
+  .group-msg-row.sent .group-msg-bubble { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; border-bottom-right-radius: 4px; }
+  .group-msg-row.received .group-msg-bubble { background: #ffffff; color: var(--text); border: 1.5px solid #e2e8f0; border-bottom-left-radius: 4px; }
+  .group-msg-time { font-size: 10.5px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+
+  .group-typing-box { display: none; align-items: center; gap: 10px; align-self: flex-start; padding: 4px 10px; }
+  .group-typing-box.show { display: flex; }
+  .group-typing-bubble { background: #ffffff; border: 1.5px solid #e2e8f0; padding: 10px 16px; border-radius: 14px; display: flex; gap: 5px; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+  .typing-dot { width: 7px; height: 7px; background: #64748b; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+  .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+  @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+
+  .chat-input-footer { background: #fff; border-top: 2px solid #e2e8f0; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .chat-input-row { display: flex; align-items: center; gap: 10px; }
+  .chat-input { flex: 1; padding: 11px 16px; border: 2px solid #cbd5e1; border-radius: 12px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .chat-input:focus { border-color: #2563eb; }
+  
+  .btn-attach { background: #f1f5f9; border: 2px solid #cbd5e1; color: var(--primary); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
+  .btn-attach:hover { background: #e2e8f0; border-color: #94a3b8; }
+
+  .chat-send { background: var(--primary); color: #fff; border: none; padding: 11px 22px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 13.5px; transition: background 0.2s; flex-shrink: 0; }
+  .chat-send:hover { background: #0f172a; }
+
+  .file-preview-pill { display: none; align-items: center; justify-content: space-between; background: #eff6ff; border: 1.5px solid #bfdbfe; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #1e40af; }
+  .file-preview-pill.show { display: flex; }
+
+  /* PANELES */
+  .control-label { font-size: 11.5px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .control-input, .control-textarea { width: 100%; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; margin-bottom: 12px; font-family: inherit; }
+  .control-textarea { resize: vertical; height: 55px; }
+
+  .stress-bar-container { background: #e2e8f0; border-radius: 999px; height: 12px; width: 100%; overflow: hidden; margin-bottom: 12px; position: relative; }
+  .stress-bar-fill { height: 100%; width: 15%; background: #22c55e; transition: width 0.4s ease, background-color 0.4s ease; }
+
+  .btn-save-panel {
+    background: var(--primary); color: #fff; border: none; width: 100%; padding: 9px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-save-panel:hover { background: #0f172a; }
+
+  .main-room-content { flex: 1; }
+  .room-master-card { background: #ffffff; border: 2px solid #cbd5e1; border-radius: 18px; padding: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); position: relative; }
+  .room-header-box { display: flex; align-items: center; gap: 28px; padding-bottom: 25px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
+  .avatar-wrapper { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .team-avatar-large { width: 130px; height: 130px; border-radius: 18px; object-fit: cover; border: 3px solid var(--primary); box-shadow: 0 6px 15px rgba(15,23,42,0.15); }
+  .btn-change-photo { display: none; background: #e0f2fe; color: #0284c7; border: 1.5px dashed #0284c7; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; }
+  .room-main-info { flex: 1; }
+  .room-badge { display: inline-block; background: #e0f2fe; color: #0369a1; font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 999px; margin-bottom: 8px; }
+  .room-title { font-size: 30px; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; }
+  .edit-room-btn {
+    position: absolute; top: 30px; right: 30px; background: #f1f5f9; color: var(--primary); border: 1.5px solid #cbd5e1; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .edit-room-btn:hover { background: #e2e8f0; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 25px; }
+  .stat-box { border: 2px solid #cbd5e1; border-radius: 14px; padding: 18px; background: #f8fafc; }
+  .stat-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .stat-value { font-size: 17px; font-weight: 800; color: var(--text); }
+  .edit-input { width: 100%; padding: 10px 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; font-weight: 700; outline: none; display: none; margin-top: 4px; }
+  .save-zone { display: none; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 2px solid #e2e8f0; }
+  .btn-save-room { background: var(--primary); color: #fff; border: none; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; transition: background 0.2s; }
+  .btn-save-room:hover { background: #0f172a; }
+</style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="/dashboard" class="brand-logo">⚡ ASINCRO</a>
+      <div class="nav-links">
+        <a href="/mis_salas" class="nav-link">Mis Salas</a>
+        <a href="/otras_salas" class="nav-link">Otras Salas</a>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="javascript:history.back()" class="btn-regresar-top">← Regresar</a>
+      
+      <div class="profile-trigger" onclick="toggleDropdown()">
+        <img src="{{ user.picture }}" alt="Avatar" class="user-avatar-top">
+        <span class="notification-dot {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}"></span>
+        <span style="font-size: 13.5px; font-weight: 600; color: #fff;">{{ user.name.split(' ')[0] }} ▾</span>
+      </div>
+
+      <div class="dropdown-menu" id="profileDropdown">
+        <a href="/perfil" class="dropdown-item">👤 Perfil</a>
+        <a href="/mensajes" class="dropdown-item">
+          <span>💬 Mensajes</span>
+          <span class="dot-inline {% if not user.pais or not user.ciudad or not user.ciepais or has_unread %}active{% endif %}"></span>
+        </a>
+        <a href="/logout" class="dropdown-item logout">🚪 Cerrar sesión</a>
+      </div>
+    </div>
+  </nav>
+
+  {% set es_lider = (room.lider_email == user.email) or (room.lider == user.name) %}
+
+  <div class="layout-container">
+    
+    <!-- PANEL IZQUIERDO -->
+    <div class="sidebar-left">
+      <!-- 1. Integrantes -->
+      <div class="panel-box">
+        <div class="panel-header" onclick="toggleMembers()">
+          <span>👥 Integrantes ({{ total_conectados }})</span>
+          <span id="arrowIcon">▼</span>
+        </div>
+        <div class="panel-body members-list" id="membersList" style="display: block;">
+          {% for m in miembros %}
+          <div class="member-item">
+            <div class="member-info-left">
+              <img src="{{ m.foto if m.foto else 'https://www.w3schools.com/howto/img_avatar.png' }}" alt="Avatar" class="member-avatar">
+              <span class="private-badge-dot" id="dot-{{ m.email }}"></span>
+              <div>
+                <div class="member-name">{{ m.nombre.split(' ')[0] }}</div>
+                <div style="font-size: 10px; color: var(--muted);">{{ 'Líder' if loop.first else 'Integrante' }}</div>
+              </div>
+            </div>
+            {% if m.email != user.email %}
+            <button type="button" class="btn-private-chat" onclick="openPrivateChat('{{ m.email }}', '{{ m.nombre }}')">💬 Chatear</button>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 2. Panel de Colaboración con IA Potente + Emoticones con Nombre -->
+      <div class="panel-box">
+        <div class="panel-header">
+          <span>📊 Panel de Colaboración</span>
+        </div>
+        <div class="panel-body">
+          <form onsubmit="enviarComentarioColaborativo(event)">
+            <label class="control-label">💬 Comentario de trabajo grupal</label>
+            <textarea class="control-textarea" id="txtComentarioColab" placeholder="Ej: 'Aún no lo hice', 'Ya estoy avanzando', 'Ya terminé todo'..." oninput="analizarComentarioConIAPotente(this)"></textarea>
+
+            <label class="control-label">😊 Estado de ánimo grupal</label>
+            <div class="emojis-grid-named">
+              <button type="button" class="emoji-card-btn selected" onclick="selectEmojiColab(this, '😊')">
+                <span class="emoji-symbol">😊</span>
+                <span class="emoji-name">Feliz</span>
+              </button>
+              <button type="button" class="emoji-card-btn" onclick="selectEmojiColab(this, '🚀')">
+                <span class="emoji-symbol">🚀</span>
+                <span class="emoji-name">Enérgico</span>
+              </button>
+              <button type="button" class="emoji-card-btn" onclick="selectEmojiColab(this, '🔥')">
+                <span class="emoji-symbol">🔥</span>
+                <span class="emoji-name">Motivado</span>
+              </button>
+              <button type="button" class="emoji-card-btn" onclick="selectEmojiColab(this, '🥱')">
+                <span class="emoji-symbol">🥱</span>
+                <span class="emoji-name">Cansado</span>
+              </button>
+              <button type="button" class="emoji-card-btn" onclick="selectEmojiColab(this, '😌')">
+                <span class="emoji-symbol">😌</span>
+                <span class="emoji-name">Relajado</span>
+              </button>
+              <button type="button" class="emoji-card-btn" onclick="selectEmojiColab(this, '⚡')">
+                <span class="emoji-symbol">⚡</span>
+                <span class="emoji-name">Intenso</span>
+              </button>
+            </div>
+            <input type="hidden" id="inputEmojiColab" value="😊">
+
+            <label class="control-label">🤖 IA Avance Detectado: <span id="valAvanceTexto">0</span>%</label>
+            <div id="estadoTextoIA" style="font-size: 11.5px; color: var(--muted); margin-bottom: 8px;">Escribe un comentario para calcular tu avance.</div>
+            <input type="hidden" id="inputPorcentajeTexto" value="0">
+
+            <label class="control-label">📎 Adjuntar documento para el equipo</label>
+            <input type="file" id="inputArchivoColab" style="display:none;" onchange="handleColabFileSelect(this)">
+            <button type="button" class="btn-save-panel" style="background:#0284c7; margin-bottom: 8px;" onclick="document.getElementById('inputArchivoColab').click()">📁 Subir archivo o tarea</button>
+            <div id="colabFileLabel" style="font-size: 11.5px; color: var(--muted); margin-bottom: 12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Ningún archivo adjunto.</div>
+
+            <button type="submit" class="btn-save-panel" style="background:#2563eb;">📤 Enviar y Actualizar Estado</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 3. Evaluación de Estrés Personal -->
+      <div class="panel-box">
+        <div class="panel-header" style="background: #334155;">
+          <span>🔒 Evaluación de Estrés Personal</span>
+        </div>
+        <div class="panel-body" style="text-align: center; padding: 20px 16px;">
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">
+            Nivel de estrés personal calculado mediante test interactivo:
+          </p>
+          <div id="panelEstresPorcentaje" style="font-size: 22px; font-weight: 900; color: var(--primary); margin-bottom: 15px;">0%</div>
+          
+          <button type="button" class="btn-save-panel" style="background: #059669; padding: 10px; font-size: 13px; margin-bottom: 8px;" onclick="verResultadosEstres()">
+            📊 Ver tus resultados de estrés
+          </button>
+
+          <button type="button" class="btn-save-panel" style="background: #2563eb; padding: 12px; font-size: 13.5px;" onclick="abrirQuizEstres()">
+            ⚡ Calcule su estrés en el trabajo grupal
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTRO: SALA Y CHAT EN VIVO -->
+    <div class="main-room-content">
+      <form action="/editar_sala/{{ room.codigo }}" method="POST" enctype="multipart/form-data" class="room-master-card">
+        
+        {% if es_lider %}
+        <button type="button" class="edit-room-btn" id="btnToggleEdit" onclick="toggleEditRoom()">✏️ Editar sala</button>
+        {% endif %}
+
+        <div class="room-header-box">
+          <div class="avatar-wrapper">
+            <img src="{{ room.foto }}" alt="Foto del Equipo" class="team-avatar-large" id="roomAvatarPreview">
+            {% if es_lider %}
+            <label for="inputFotoSala" class="btn-change-photo" id="labelCambiarFoto">📁 Cambiar foto</label>
+            <input type="file" name="foto_equipo" id="inputFotoSala" accept="image/*" style="display: none;">
+            {% endif %}
+          </div>
+          
+          <div class="room-main-info">
+            <span class="room-badge">✅ SALA GRUPAL ACTIVA</span>
+            <h1 class="room-title">{{ room.nombre }}</h1>
+            <p style="font-size: 14px; color: var(--muted);">
+              Líder de Sala: <strong>{{ room.lider }}</strong> • Creada el {{ room.creada }}
+            </p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Nombre del Equipo</div>
+            <div class="stat-value display-room-field">{{ room.nombre }}</div>
+            {% if es_lider %}
+            <input type="text" name="nombre_sala" class="edit-input" value="{{ room.nombre }}" required>
+            {% endif %}
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Límite de Usuarios en Sala</div>
+            <div class="stat-value display-room-field">👥 Máximo {{ room.limite }} integrantes ({{ total_conectados }} / {{ room.limite }} conectados)</div>
+            {% if es_lider %}
+            <input type="number" name="limite_usuarios" class="edit-input" min="2" max="50" value="{{ room.limite }}" required>
+            {% endif %}
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Código de Invitación</div>
+            <div class="stat-value" style="color: var(--primary);">{{ room.codigo }}</div>
+          </div>
+        </div>
+
+        {% if es_lider %}
+        <div class="save-zone" id="saveRoomZone">
+          <button type="submit" class="btn-save-room">💾 Guardar cambios de sala</button>
+        </div>
+        {% endif %}
+
+      </form>
+
+      <!-- CHAT GRUPAL EN VIVO -->
+      <div class="group-chat-card">
+        <div class="group-chat-header">
+          <span>💬 Chat Grupal del Equipo en Vivo</span>
+        </div>
+        
+        <div class="group-chat-messages" id="groupChatMessagesBox">
+          <div class="group-typing-box" id="groupTypingIndicator">
+            <div class="group-typing-bubble">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+            <span id="groupTypingText" style="font-size: 11px; font-weight: 700; color: var(--muted);">Alguien está escribiendo...</span>
+          </div>
+        </div>
+
+        <div class="chat-input-footer">
+          <div class="file-preview-pill" id="groupFilePreviewPill">
+            <span id="groupFileNameLabel" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px;"></span>
+            <button type="button" onclick="quitarArchivoGrupo()" style="background:none; border:none; color:#1e40af; font-weight:900; cursor:pointer;">×</button>
+          </div>
+          <div class="chat-input-row">
+            <input type="file" id="groupFileInput" style="display:none;" onchange="handleGroupFileSelect(this)">
+            <button type="button" class="btn-attach" onclick="document.getElementById('groupFileInput').click()" title="Adjuntar imagen o archivo">📎</button>
+            <input type="text" class="chat-input" id="groupChatInputText" placeholder="Escribe un mensaje para el equipo..." oninput="notificarEscribiendoGrupo()" onkeypress="if(event.key === 'Enter') sendGroupMessage()">
+            <button type="button" class="chat-send" onclick="sendGroupMessage()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZONA DERECHA: ESTADO DE INTEGRANTES Y ANALÍTICAS -->
+    <div class="sidebar-right">
+      <div class="team-status-title">📋 Estado de Integrantes</div>
+
+      <div class="team-analytics-box">
+        <div class="analytics-section">
+          <div class="analytics-label">
+            <span>⚡ Nivel de Estrés del Equipo</span>
+            <span id="teamStressVal">0%</span>
+          </div>
+          <div class="analytics-bar-bg">
+            <div class="analytics-bar-fill" id="teamStressFill" style="width: 0%; background-color: #22c55e;"></div>
+          </div>
+        </div>
+
+        <div class="analytics-section">
+          <div class="analytics-label">
+            <span>🎯 Progreso Total del Equipo</span>
+            <span id="teamProgressVal">0%</span>
+          </div>
+          <div class="analytics-bar-bg">
+            <div class="analytics-bar-fill" id="teamProgressFill" style="width: 0%; background-color: #2563eb;"></div>
+          </div>
+        </div>
+
+        <!-- EMOTICÓN MÁS USADO -->
+        <div class="analytics-section" style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
+          <div class="analytics-label">
+            <span>😊 Emoticón Más Usado</span>
+            <span id="teamTopEmoji" style="font-size: 15px;">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="teamStatusCardsContainer" style="display: flex; flex-direction: column; gap: 15px;">
+        <!-- Se cargarán dinámicamente -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INTERFAZ MODAL DE TEST DE ESTRÉS -->
+  <div class="quiz-modal" id="quizModal">
+    <div class="quiz-container">
+      <div class="quiz-header" id="quizHeaderTitle">
+        <span>📋 Test de Estrés en el Trabajo Grupal (10 Preguntas)</span>
+        <button type="button" class="chat-close" onclick="cerrarQuizEstres()">×</button>
+      </div>
+      <div class="quiz-body" id="quizBodyContent">
+        <!-- Contenido dinámico -->
+      </div>
+      <div style="background: #f8fafc; padding: 15px 25px; border-top: 2px solid #e2e8f0; display: flex; justify-content: flex-end;">
+        <button type="button" class="btn-save-panel" id="btnAccionQuiz" style="width: auto; padding: 10px 25px; background: #2563eb;" onclick="calcularResultadoQuiz()">📊 Obtener Diagnóstico de Estrés</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT PRIVADO FLOTANTE -->
+  <div class="chat-modal" id="privateChatModal">
+    <div class="chat-header">
+      <span id="chatTitle">Chat Privado</span>
+      <button type="button" class="chat-close" onclick="closePrivateChat()">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessagesBox">
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+    <div class="chat-input-footer">
+      <div class="file-preview-pill" id="filePreviewPill">
+        <span id="fileNameLabel" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px;"></span>
+        <button type="button" onclick="quitarArchivo()" style="background:none; border:none; color:#1e40af; font-weight:900; cursor:pointer;">×</button>
+      </div>
+      <div class="chat-input-row">
+        <input type="file" id="chatFileInput" style="display:none;" onchange="handleFileSelect(this)">
+        <button type="button" class="btn-attach" onclick="document.getElementById('chatFileInput').click()" title="Adjuntar documento o imagen">📎</button>
+        <input type="text" class="chat-input" id="chatInputText" placeholder="Escribe un mensaje..." oninput="notificarEscribiendo()" onkeypress="if(event.key === 'Enter') sendPrivateMessage()">
+        <button type="button" class="chat-send" onclick="sendPrivateMessage()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const codigoSala = "{{ room.codigo }}";
+    const miEmail = "{{ user.email }}";
+    let chatActivoEmail = null;
+    let intervaloChat = null;
+    let intervaloGrupo = null;
+    let intervaloColab = null;
+    let ultimoTiempoEscrito = 0;
+    let ultimoTiempoEscritoGrupo = 0;
+    let archivoAdjuntoSeleccionado = null;
+    let archivoGrupoSeleccionado = null;
+    let archivoColabSeleccionado = null;
+    let ultimaCantidadMensajes = -1;
+    let ultimaCantidadMensajesPrivados = -1;
+    let ultimoResultadoHTML = "<div style='text-align:center; color:var(--muted); padding:20px;'>Aún no has completado el test de estrés. Haz clic en 'Calcule su estrés en el trabajo grupal' para comenzar.</div>";
+
+    function toggleDropdown() {
+      document.getElementById('profileDropdown').classList.toggle('show');
+    }
+
+    function toggleMembers() {
+      const list = document.getElementById('membersList');
+      const arrow = document.getElementById('arrowIcon');
+      if (list.style.display === 'none') {
+        list.style.display = 'block';
+        arrow.textContent = '▼';
+      } else {
+        list.style.display = 'none';
+        arrow.textContent = '▶';
+      }
+    }
+
+    /* IA POTENTE ANALÍTICA DE COMENTARIOS + EMOTICONOS */
+    function analizarComentarioConIAPotente(textarea) {
+      let texto = textarea.value.toLowerCase().trim();
+      let emojiActual = document.getElementById('inputEmojiColab').value;
+      let porcentaje = 0;
+      let estadoStr = "🔴 No iniciado (0%)";
+
+      if (texto === "") {
+        porcentaje = 0;
+        estadoStr = "Sin actividad descrita";
+      } else {
+        const palabrasTerminado = ["termine", "terminé", "listo", "finalice", "finalicé", "acabe", "acabé", "completado", "entregado", "todo hecho", "todo el trabajo"];
+        let esTerminado = palabrasTerminado.some(p => texto.includes(p));
+
+        const palabrasCero = ["aun no", "aún no", "no lo hice", "empecé", "empeze", "pendiente", "nada", "cero", "empezando"];
+        let esCero = palabrasCero.some(p => texto.includes(p));
+
+        const palabrasMedias = ["avanzando", "medias", "falta", "poco", "proceso", "desarrollo", "mitad", "avanzado"];
+        let esMedias = palabrasMedias.some(p => texto.includes(p));
+
+        if (esTerminado && !esCero) {
+          porcentaje = 100;
+          estadoStr = "🟢 ¡Trabajo Terminado! (100%)";
+        } else if (esCero) {
+          porcentaje = 0;
+          estadoStr = "🔴 Aún no lo hice / Pendiente (0%)";
+        } else if (esMedias) {
+          porcentaje = 50;
+          estadoStr = "🟡 Avanzando pero falta (50%)";
+        } else if (texto.length > 35) {
+          porcentaje = 75;
+          estadoStr = "🔵 En desarrollo activo (75%)";
+        } else {
+          porcentaje = 25;
+          estadoStr = "🟠 Fase inicial (25%)";
+        }
+      }
+
+      if (emojiActual === '🚀' || emojiActual === '🔥') {
+        if (porcentaje > 0 && porcentaje < 100) {
+          porcentaje = Math.min(90, porcentaje + 15);
+          estadoStr += " (🚀 Impulsado)";
+        }
+      } else if (emojiActual === '🥱') {
+        if (porcentaje > 0 && porcentaje < 100) {
+          porcentaje = Math.max(10, porcentaje - 15);
+          estadoStr += " (🥱 Demorado por fatiga)";
+        }
+      }
+
+      document.getElementById('valAvanceTexto').textContent = porcentaje;
+      document.getElementById('inputPorcentajeTexto').value = porcentaje;
+      document.getElementById('estadoTextoIA').textContent = "IA detectó: " + estadoStr;
+    }
+
+    const bancoPreguntas = [
+      "¿Sientes que la cantidad de trabajo asignado en el equipo supera tu capacidad diaria?",
+      "¿Experimentas tensión muscular, fatiga o dolores de cabeza frecuentes durante las sesiones grupales?",
+      "¿Te cuesta concentrarte en tus tareas asignadas debido a la presión o plazos ajustados?",
+      "¿Sientes que hay falta de comunicación o desacuerdos constantes entre los integrantes?",
+      "¿Te preocupa no cumplir con las expectativas de tus compañeros o del líder de sala?",
+      "¿Te irritas o pierdes la paciencia con facilidad al coordinar las actividades del proyecto?",
+      "¿Sientes que tus opiniones o aportes no son tomados en cuenta por el equipo?",
+      "¿Dormir bien se ha vuelto difícil debido a preocupaciones pendientes sobre el trabajo grupal?",
+      "¿Sientes que asumes más responsabilidades y carga de trabajo que el resto de tus compañeros?",
+      "¿Te invade una sensación constante de agotamiento mental al finalizar la jornada de trabajo?",
+      "¿Te sientes abrumado por la cantidad de herramientas o documentos que manejas en el proyecto?",
+      "¿Experimentas ansiedad cuando se acerca una fecha límite de entrega grupal?",
+      "¿Sientes que el ritmo de trabajo del equipo no te permite tomar descansos adecuados?",
+      "¿Te cuesta desconectarte mentalmente de los pendientes del equipo al terminar tu día?"
+    ];
+
+    let preguntasActuales = [];
+
+    function abrirQuizEstres() {
+      let mezcladas = [...bancoPreguntas].sort(() => 0.5 - Math.random());
+      preguntasActuales = mezcladas.slice(0, 10);
+
+      const body = document.getElementById('quizBodyContent');
+      body.innerHTML = '';
+
+      preguntasActuales.forEach((pregunta, index) => {
+        const qDiv = document.createElement('div');
+        qDiv.style.marginBottom = "15px";
+
+        const qTitle = document.createElement('div');
+        qTitle.className = 'quiz-question';
+        qTitle.textContent = (index + 1) + ". " + pregunta;
+        qDiv.appendChild(qTitle);
+
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'quiz-options';
+
+        const opciones = [
+          { texto: "Casi nunca / Nunca", val: 0 },
+          { texto: "A veces", val: 5 },
+          { texto: "Frecuentemente / Siempre", val: 10 }
+        ];
+
+        opciones.forEach(opt => {
+          const label = document.createElement('label');
+          label.className = 'quiz-option-label';
+
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'p' + index;
+          radio.value = opt.val;
+          if (opt.val === 0) radio.checked = true;
+
+          label.appendChild(radio);
+          label.appendChild(document.createTextNode(opt.texto));
+          optsDiv.appendChild(label);
+        });
+
+        qDiv.appendChild(optsDiv);
+        body.appendChild(qDiv);
+      });
+
+      const btnAccion = document.getElementById('btnAccionQuiz');
+      btnAccion.textContent = "📊 Obtener Diagnóstico de Estrés";
+      btnAccion.style.backgroundColor = "#2563eb";
+      btnAccion.onclick = calcularResultadoQuiz;
+
+      document.getElementById('quizModal').classList.add('show');
+    }
+
+    function verResultadosEstres() {
+      const body = document.getElementById('quizBodyContent');
+      body.innerHTML = ultimoResultadoHTML;
+
+      const btnAccion = document.getElementById('btnAccionQuiz');
+      btnAccion.textContent = "✔ Terminar";
+      btnAccion.style.backgroundColor = "#22c55e";
+      btnAccion.onclick = cerrarQuizEstres;
+
+      document.getElementById('quizModal').classList.add('show');
+    }
+
+    function cerrarQuizEstres() {
+      document.getElementById('quizModal').classList.remove('show');
+    }
+
+    function calcularResultadoQuiz() {
+      let puntajeTotal = 0;
+      for (let i = 0; i < preguntasActuales.length; i++) {
+        const radios = document.getElementsByName('p' + i);
+        for (let r of radios) {
+          if (r.checked) {
+            puntajeTotal += parseInt(r.value);
+            break;
+          }
+        }
+      }
+
+      let porcentajeEstres = puntajeTotal;
+      document.getElementById('panelEstresPorcentaje').textContent = porcentajeEstres + "%";
+
+      if (porcentajeEstres > 50) {
+        ultimoResultadoHTML = `
+          <div style="background: #fef2f2; border: 2px solid #fecaca; padding: 20px; border-radius: 12px; color: #991b1b;">
+            <h3 style="margin-bottom: 8px;">🔴 Nivel de Estrés Alto: ${porcentajeEstres}%</h3>
+            <p style="font-size: 13.5px; line-height: 1.5; font-weight: 600;">
+              <strong>Recomendación Profesional:</strong> Estás experimentando una sobrecarga significativa en el trabajo grupal. Es vital que delegues tareas, establezcas descansos activos de 10 minutos cada hora y comuniques tus límites de tiempo con claridad a tus compañeros para evitar el agotamiento crónico.
+            </p>
+          </div>
+        `;
+      } else {
+        ultimoResultadoHTML = `
+          <div style="background: #f0fdf4; border: 2px solid #bbf7d0; padding: 20px; border-radius: 12px; color: #166534;">
+            <h3 style="margin-bottom: 8px;">🟢 ¡Felicitaciones! Nivel de Estrés Controlado: ${porcentajeEstres}%</h3>
+            <p style="font-size: 13.5px; line-height: 1.5; font-weight: 600;">
+              <strong>Advertencia Preventiva:</strong> Mantienes un excelente equilibrio emocional y control de cargas. Sin embargo, no bajes la guardia: mantén tus hábitos de organización y descanso diario, ya que los cambios imprevistos en proyectos grupales pueden escalar rápido si descuidas la comunicación.
+            </p>
+          </div>
+        `;
+      }
+
+      document.getElementById('quizBodyContent').innerHTML = ultimoResultadoHTML;
+
+      const btnAccion = document.getElementById('btnAccionQuiz');
+      btnAccion.textContent = "✔ Terminar";
+      btnAccion.style.backgroundColor = "#22c55e";
+      btnAccion.onclick = cerrarQuizEstres;
+    }
+
+    function selectEmojiColab(btn, emoji) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.emoji-card-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('inputEmojiColab').value = emoji;
+      
+      const txtArea = document.getElementById('txtComentarioColab');
+      if (txtArea.value.trim() !== "") {
+        analizarComentarioConIAPotente(txtArea);
+      }
+    }
+
+    function handleColabFileSelect(input) {
+      if (input.files && input.files[0]) {
+        archivoColabSeleccionado = input.files[0];
+        document.getElementById('colabFileLabel').textContent = "📁 " + archivoColabSeleccionado.name;
+      }
+    }
+
+    function enviarComentarioColaborativo(e) {
+      e.preventDefault();
+      const txt = document.getElementById('txtComentarioColab').value.trim();
+      const emoji = document.getElementById('inputEmojiColab').value;
+      const avance = document.getElementById('inputPorcentajeTexto').value;
+      const estadoDoc = document.getElementById('estadoTextoIA').textContent.replace("IA detectó: ", "");
+
+      if (!txt && !archivoColabSeleccionado) {
+        alert('Escribe un comentario o adjunta un archivo antes de enviar.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('codigo', codigoSala);
+      formData.append('comentario', txt ? txt : "Actualizó su archivo adjunto.");
+      formData.append('emoji', emoji);
+      formData.append('avance', avance);
+      formData.append('estado_doc', estadoDoc);
+      if (archivoColabSeleccionado) {
+        formData.append('archivo', archivoColabSeleccionado);
+      }
+
+      fetch('/api/colaboracion/guardar', { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'ok') {
+          archivoColabSeleccionado = null;
+          document.getElementById('inputArchivoColab').value = '';
+          document.getElementById('colabFileLabel').textContent = 'Ningún archivo adjunto.';
+          cargarTarjetonesColaborativos();
+          alert('¡Tu estado, avance y archivo han sido compartidos con todo el equipo!');
+        }
+      });
+    }
+
+    /* CARGAR TARJETONES Y CALCULAR PROMEDIOS + EMOTICÓN MÁS USADO */
+    function cargarTarjetonesColaborativos() {
+      fetch(`/api/colaboracion/obtener?codigo=${codigoSala}`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('teamStatusCardsContainer');
+          container.innerHTML = '';
+
+          if (data.registros.length === 0) {
+            container.innerHTML = '<div style="font-size:12px; color:var(--muted); text-align:center; padding:15px;">Aún no hay reportes de colaboradores.</div>';
+            document.getElementById('teamProgressVal').textContent = "0%";
+            document.getElementById('teamProgressFill').style.width = "0%";
+            document.getElementById('teamStressVal').textContent = "0%";
+            document.getElementById('teamStressFill').style.width = "0%";
+            document.getElementById('teamTopEmoji').textContent = "-";
+            return;
+          }
+
+          let sumaAvances = 0;
+          let sumaEstresParcial = 0;
+          let conteoEmojis = {};
+
+          data.registros.forEach(reg => {
+            sumaAvances += reg.avance;
+
+            let em = reg.emoji || '😊';
+            conteoEmojis[em] = (conteoEmojis[em] || 0) + 1;
+
+            let estresIndiv = 20;
+            if (em === '🥱') estresIndiv = 75;
+            else if (em === '🔥' || em === '⚡') estresIndiv = 60;
+            else if (em === '🚀') estresIndiv = 35;
+            else if (em === '😊' || em === '😌') estresIndiv = 15;
+
+            let comLower = (reg.comentario || "").toLowerCase();
+            if (comLower.includes("estrés") || comLower.includes("cansado") || comLower.includes("pesado") || comLower.includes("difícil")) {
+              estresIndiv += 25;
+            }
+            sumaEstresParcial += Math.min(100, estresIndiv);
+
+            const card = document.createElement('div');
+            card.className = 'user-status-card';
+
+            const header = document.createElement('div');
+            header.className = 'usc-header';
+
+            const avatar = document.createElement('img');
+            avatar.src = reg.foto || 'https://www.w3schools.com/howto/img_avatar.png';
+            avatar.className = 'usc-avatar';
+
+            const info = document.createElement('div');
+            info.style.flex = '1';
+
+            const nameRow = document.createElement('div');
+            nameRow.style.display = 'flex';
+            nameRow.style.justifyContent = 'space-between';
+            nameRow.style.alignItems = 'center';
+
+            const name = document.createElement('div');
+            name.className = 'usc-name';
+            name.textContent = reg.nombre.split(' ')[0] + " " + em;
+
+            const time = document.createElement('div');
+            time.className = 'usc-time';
+            time.textContent = reg.hora;
+
+            nameRow.appendChild(name);
+            nameRow.appendChild(time);
+            info.appendChild(nameRow);
+
+            const docState = document.createElement('div');
+            docState.style.cssText = "font-size: 11px; font-weight: 700; color: #0284c7; margin-top: 2px;";
+            docState.textContent = reg.estado_doc;
+            info.appendChild(docState);
+
+            header.appendChild(avatar);
+            header.appendChild(info);
+            card.appendChild(header);
+
+            if (reg.comentario) {
+              const comm = document.createElement('div');
+              comm.className = 'usc-comment';
+              comm.textContent = reg.comentario;
+              card.appendChild(comm);
+            }
+
+            if (reg.archivo_data) {
+              const fileLink = document.createElement('a');
+              fileLink.href = reg.archivo_data;
+              fileLink.download = reg.archivo_nombre || 'archivo_proyecto';
+              fileLink.className = 'usc-file-download';
+              fileLink.innerHTML = '📎 <span>Descargar: ' + (reg.archivo_nombre || 'Archivo adjunto') + '</span>';
+              card.appendChild(fileLink);
+            }
+
+            const progWrap = document.createElement('div');
+            progWrap.style.cssText = "display: flex; flex-direction: column; gap: 3px; margin-top: 4px;";
+
+            const progLabel = document.createElement('div');
+            progLabel.style.cssText = "font-size: 11px; font-weight: 800; color: var(--muted); display: flex; justify-content: space-between;";
+            progLabel.innerHTML = '<span>Avance detectado</span><span>' + reg.avance + '%</span>';
+
+            const progBar = document.createElement('div');
+            progBar.className = 'usc-progress-bar';
+
+            const progFill = document.createElement('div');
+            progFill.className = 'usc-progress-fill';
+            progFill.style.width = reg.avance + '%';
+            if (reg.avance === 100) progFill.style.backgroundColor = '#22c55e';
+            else if (reg.avance >= 50) progFill.style.backgroundColor = '#2563eb';
+            else progFill.style.backgroundColor = '#ef4444';
+
+            progBar.appendChild(progFill);
+            progWrap.appendChild(progLabel);
+            progWrap.appendChild(progBar);
+            card.appendChild(progWrap);
+
+            container.appendChild(card);
+          });
+
+          let topEmoji = "-";
+          let maxCount = 0;
+          for (let em in conteoEmojis) {
+            if (conteoEmojis[em] > maxCount) {
+              maxCount = conteoEmojis[em];
+              topEmoji = em;
+            }
+          }
+          document.getElementById('teamTopEmoji').textContent = topEmoji + " (" + maxCount + ")";
+
+          let totalIntegrantes = data.registros.length;
+          let promedioAvanceTotal = Math.round(sumaAvances / totalIntegrantes);
+          let promedioEstresEquipo = Math.round(sumaEstresParcial / totalIntegrantes);
+
+          document.getElementById('teamStressVal').textContent = promedioEstresEquipo + "%";
+          const stressFill = document.getElementById('teamStressFill');
+          stressFill.style.width = promedioEstresEquipo + "%";
+          if (promedioEstresEquipo > 65) stressFill.style.backgroundColor = '#ef4444';
+          else if (promedioEstresEquipo > 35) stressFill.style.backgroundColor = '#f59e0b';
+          else stressFill.style.backgroundColor = '#22c55e';
+
+          document.getElementById('teamProgressVal').textContent = promedioAvanceTotal + "%";
+          const progTotalFill = document.getElementById('teamProgressFill');
+          progTotalFill.style.width = promedioAvanceTotal + "%";
+          if (promedioAvanceTotal === 100) {
+            progTotalFill.style.backgroundColor = '#22c55e';
+          } else {
+            progTotalFill.style.backgroundColor = '#2563eb';
+          }
+        });
+    }
+
+    cargarTarjetonesColaborativos();
+    intervaloColab = setInterval(cargarTarjetonesColaborativos, 2500);
+
+    /* CHAT GRUPAL EN VIVO CON VERIFICACIÓN DE AUSENCIA (2 MINUTOS) */
+    function cargarChatGrupal() {
+      fetch(`/api/chat/grupo/mensajes?codigo=${codigoSala}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.mensajes.length === ultimaCantidadMensajes) {
+            verificarEscribiendoGrupoUnico();
+            return;
+          }
+          ultimaCantidadMensajes = data.mensajes.length;
+
+          const box = document.getElementById('groupChatMessagesBox');
+          const typingInd = document.getElementById('groupTypingIndicator');
+          
+          box.innerHTML = '';
+          
+          if(data.mensajes.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.cssText = "text-align:center; color:var(--muted); font-size:13px; margin:20px 0;";
+            emptyDiv.textContent = "No hay mensajes en el chat grupal aún. ¡Saluda a tu equipo!";
+            box.appendChild(emptyDiv);
+          }
+
+          data.mensajes.forEach(m => {
+            const esMio = (m.remitente_email === miEmail);
+            const row = document.createElement('div');
+            row.className = 'group-msg-row ' + (esMio ? 'sent' : 'received');
+
+            const avatar = document.createElement('img');
+            avatar.src = m.remitente_foto || 'https://www.w3schools.com/howto/img_avatar.png';
+            avatar.className = 'group-msg-avatar';
+            row.appendChild(avatar);
+
+            const content = document.createElement('div');
+            content.className = 'group-msg-content';
+
+            const author = document.createElement('div');
+            author.className = 'group-msg-author';
+            author.textContent = m.remitente_nombre;
+            content.appendChild(author);
+
+            const bubble = document.createElement('div');
+            bubble.className = 'group-msg-bubble';
+
+            if (m.texto) {
+              const txt = document.createElement('div');
+              txt.textContent = m.texto;
+              bubble.appendChild(txt);
+            }
+
+            if (m.archivo_data) {
+              const fileLink = document.createElement('a');
+              fileLink.href = m.archivo_data;
+              fileLink.download = m.archivo_nombre || 'archivo';
+              fileLink.className = 'chat-file-preview';
+              
+              if (m.archivo_data.startsWith('data:image/')) {
+                const img = document.createElement('img');
+                img.src = m.archivo_data;
+                fileLink.appendChild(img);
+              } else {
+                const icon = document.createElement('span');
+                icon.style.fontSize = '18px';
+                icon.textContent = '📄';
+                fileLink.appendChild(icon);
+              }
+              const nameSpan = document.createElement('span');
+              nameSpan.textContent = m.archivo_nombre || 'Descargar archivo';
+              fileLink.appendChild(nameSpan);
+              bubble.appendChild(fileLink);
+            }
+
+            const time = document.createElement('div');
+            time.className = 'group-msg-time';
+            time.textContent = m.hora;
+            content.appendChild(bubble);
+            content.appendChild(time);
+
+            row.appendChild(content);
+            box.appendChild(row);
+          });
+          
+          box.appendChild(typingInd);
+          box.scrollTop = box.scrollHeight;
+        });
+
+      verificarEscribiendoGrupoUnico();
+    }
+
+    function verificarEscribiendoGrupoUnico() {
+      fetch(`/api/chat/grupo/ver_escribiendo?codigo=${codigoSala}`)
+        .then(res => res.json())
+        .then(data => {
+          const ind = document.getElementById('groupTypingIndicator');
+          const txt = document.getElementById('groupTypingText');
+          if (data.escribiendo_nombres && data.escribiendo_nombres.length > 0) {
+            txt.textContent = data.escribiendo_nombres.join(', ') + " está escribiendo...";
+            ind.classList.add('show');
+          } else {
+            ind.classList.remove('show');
+          }
+        });
+    }
+
+    function notificarEscribiendoGrupo() {
+      const ahora = Date.now();
+      if (ahora - ultimoTiempoEscritoGrupo > 2000) {
+        ultimoTiempoEscritoGrupo = ahora;
+        fetch('/api/chat/grupo/escribiendo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo: codigoSala })
+        });
+      }
+    }
+
+    function handleGroupFileSelect(input) {
+      if (input.files && input.files[0]) {
+        archivoGrupoSeleccionado = input.files[0];
+        document.getElementById('groupFileNameLabel').textContent = "📎 " + archivoGrupoSeleccionado.name;
+        document.getElementById('groupFilePreviewPill').classList.add('show');
+      }
+    }
+
+    function quitarArchivoGrupo() {
+      archivoGrupoSeleccionado = null;
+      document.getElementById('groupFileInput').value = '';
+      document.getElementById('groupFilePreviewPill').classList.remove('show');
+    }
+
+    function sendGroupMessage() {
+      const input = document.getElementById('groupChatInputText');
+      const text = input.value.trim();
+      if (!text && !archivoGrupoSeleccionado) return;
+
+      const formData = new FormData();
+      formData.append('codigo', codigoSala);
+      formData.append('texto', text);
+      if (archivoGrupoSeleccionado) {
+        formData.append('archivo', archivoGrupoSeleccionado);
+      }
+
+      fetch('/api/chat/grupo/enviar', { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'ok') {
+          input.value = '';
+          quitarArchivoGrupo();
+          ultimaCantidadMensajes = -1;
+          cargarChatGrupal();
+        }
+      });
+    }
+
+    cargarChatGrupal();
+    intervaloGrupo = setInterval(cargarChatGrupal, 1200);
+
+    /* VERIFICACIÓN AUTOMÁTICA DE AUSENCIA (2 MINUTOS) */
+    function comprobarAusenciaEquipo() {
+      fetch(`/api/chat/grupo/verificar_ausencia?codigo=${codigoSala}`)
+        .then(res => res.json())
+        .then(data => {
+          cargarChatGrupal();
+        });
+    }
+    setInterval(comprobarAusenciaEquipo, 10000);
+
+    /* CHAT PRIVADO Y PANELES */
+    function openPrivateChat(emailIntegrante, nombreIntegrante) {
+      chatActivoEmail = emailIntegrante;
+      ultimaCantidadMensajesPrivados = -1;
+      document.getElementById('chatTitle').textContent = 'Chat con ' + nombreIntegrante;
+      document.getElementById('privateChatModal').classList.add('show');
+      
+      const dot = document.getElementById('dot-' + emailIntegrante);
+      if(dot) dot.classList.remove('active');
+
+      cargarMensajesPrivados();
+      if(intervaloChat) clearInterval(intervaloChat);
+      intervaloChat = setInterval(() => {
+        cargarMensajesPrivados();
+        verificarEscribiendo();
+      }, 1200);
+    }
+
+    function closePrivateChat() {
+      document.getElementById('privateChatModal').classList.remove('show');
+      chatActivoEmail = null;
+      ultimaCantidadMensajesPrivados = -1;
+      if(intervaloChat) clearInterval(intervaloChat);
+    }
+
+    function handleFileSelect(input) {
+      if (input.files && input.files[0]) {
+        archivoAdjuntoSeleccionado = input.files[0];
+        document.getElementById('fileNameLabel').textContent = "📎 " + archivoAdjuntoSeleccionado.name;
+        document.getElementById('filePreviewPill').classList.add('show');
+      }
+    }
+
+    function quitarArchivo() {
+      archivoAdjuntoSeleccionado = null;
+      document.getElementById('chatFileInput').value = '';
+      document.getElementById('filePreviewPill').classList.remove('show');
+    }
+
+    function notificarEscribiendo() {
+      const ahora = Date.now();
+      if (ahora - ultimoTiempoEscrito > 2000 && chatActivoEmail) {
+        ultimoTiempoEscrito = ahora;
+        fetch('/api/chat/escribiendo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo: codigoSala, destinatario_email: chatActivoEmail })
+        });
+      }
+    }
+
+    function verificarEscribiendo() {
+      if (!chatActivoEmail) return;
+      fetch(`/api/chat/ver_escribiendo?codigo=${codigoSala}&otro_email=${chatActivoEmail}`)
+        .then(res => res.json())
+        .then(data => {
+          const indicator = document.getElementById('typingIndicator');
+          if (data.escribiendo) indicator.classList.add('show');
+          else indicator.classList.remove('show');
+        });
+    }
+
+    function cargarMensajesPrivados() {
+      if (!chatActivoEmail) return;
+      fetch(`/api/chat/mensajes?codigo=${codigoSala}&otro_email=${chatActivoEmail}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.mensajes.length === ultimaCantidadMensajesPrivados) {
+            return;
+          }
+          ultimaCantidadMensajesPrivados = data.mensajes.length;
+
+          const box = document.getElementById('chatMessagesBox');
+          const indicator = document.getElementById('typingIndicator');
+          
+          box.innerHTML = '';
+
+          if (data.mensajes.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.cssText = "text-align:center; color:var(--muted); font-size:12.5px; margin:20px 0;";
+            emptyDiv.textContent = "Inicia la conversación privada o comparte un archivo.";
+            box.appendChild(emptyDiv);
+          }
+
+          data.mensajes.forEach(m => {
+            const esMio = (m.remitente_email === miEmail);
+            const container = document.createElement('div');
+            container.className = 'chat-bubble-container ' + (esMio ? 'sent' : 'received');
+
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble ' + (esMio ? 'sent' : 'received');
+
+            if (m.texto) {
+              const textDiv = document.createElement('div');
+              textDiv.textContent = m.texto;
+              bubble.appendChild(textDiv);
+            }
+
+            if (m.archivo_data) {
+              const fileLink = document.createElement('a');
+              fileLink.href = m.archivo_data;
+              fileLink.download = m.archivo_nombre || 'archivo';
+              fileLink.className = 'chat-file-preview';
+              
+              if (m.archivo_data.startsWith('data:image/')) {
+                const img = document.createElement('img');
+                img.src = m.archivo_data;
+                fileLink.appendChild(img);
+              } else {
+                const icon = document.createElement('span');
+                icon.style.fontSize = '18px';
+                icon.textContent = '📄';
+                fileLink.appendChild(icon);
+              }
+              const nameSpan = document.createElement('span');
+              nameSpan.textContent = m.archivo_nombre || 'Descargar archivo';
+              fileLink.appendChild(nameSpan);
+              bubble.appendChild(fileLink);
+            }
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'chat-time';
+            timeDiv.textContent = m.hora;
+
+            container.appendChild(bubble);
+            container.appendChild(timeDiv);
+            box.appendChild(container);
+          });
+          
+          box.appendChild(indicator);
+          box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    function sendPrivateMessage() {
+      const input = document.getElementById('chatInputText');
+      const text = input.value.trim();
+      if (!text && !archivoAdjuntoSeleccionado) return;
+
+      const formData = new FormData();
+      formData.append('codigo', codigoSala);
+      formData.append('destinatario_email', chatActivoEmail);
+      formData.append('texto', text);
+      if (archivoAdjuntoSeleccionado) {
+        formData.append('archivo', archivoAdjuntoSeleccionado);
+      }
+
+      fetch('/api/chat/enviar', { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'ok') {
+          input.value = '';
+          quitarArchivo();
+          ultimaCantidadMensajesPrivados = -1;
+          cargarMensajesPrivados();
+        }
+      });
+    }
+
+    function verificarNotificacionesChat() {
+      fetch(`/api/chat/no_leidos?codigo=${codigoSala}`)
+        .then(res => res.json())
+        .then(data => {
+          for (const email in data) {
+            const dot = document.getElementById('dot-' + email);
+            if (dot && email !== chatActivoEmail) dot.classList.add('active');
+          }
+        });
+    }
+    setInterval(verificarNotificacionesChat, 1500);
+
+    let editandoSala = false;
+    function toggleEditRoom() {
+      editandoSala = !editandoSala;
+      const displays = document.querySelectorAll('.display-room-field');
+      const inputs = document.querySelectorAll('.edit-input');
+      const labelFoto = document.getElementById('labelCambiarFoto');
+      const saveZone = document.getElementById('saveRoomZone');
+      const btnToggle = document.getElementById('btnToggleEdit');
+
+      if (editandoSala) {
+        displays.forEach(el => el.style.display = 'none');
+        inputs.forEach(el => el.style.display = 'block');
+        if(labelFoto) labelFoto.style.display = 'block';
+        if(saveZone) saveZone.style.display = 'flex';
+        btnToggle.textContent = '✖ Cancelar';
+      } else {
+        displays.forEach(el => el.style.display = 'block');
+        inputs.forEach(el => el.style.display = 'none');
+        if(labelFoto) labelFoto.style.display = 'none';
+        if(saveZone) saveZone.style.display = 'none';
+        btnToggle.textContent = '✏️ Editar sala';
+      }
+    }
+
+    window.onclick = function(event) {
+      if (!event.target.closest('.nav-right')) {
+        const dropdown = document.getElementById('profileDropdown');
+        if (dropdown) dropdown.classList.remove('show');
+      }
+    }
+  </script>
+
+</body>
+</html>

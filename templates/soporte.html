@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASINCRO - Soporte Tecnológico</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --primary-dark: #0f172a;
+    --accent: #f59e0b;
+    --bg: #f8fafc;
+    --text: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* BARRA SUPERIOR AZUL CORPORATIVA */
+  .navbar {
+    background: var(--primary-dark); color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .brand-logo { font-size: 22px; font-weight: 900; letter-spacing: 1px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: transform 0.2s; }
+  .brand-logo:hover { transform: scale(1.03); }
+  
+  .nav-right-area { display: flex; align-items: center; gap: 15px; }
+  .nav-link-top { 
+    color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 600; 
+    background: rgba(255,255,255,0.08); padding: 8px 16px; border-radius: 8px; 
+    transition: all 0.25s ease; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .nav-link-top:hover { color: #fff; background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+
+  /* HEADER / BANNER SOPORTE TECNOLÓGICO */
+  .support-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #fff;
+    padding: 70px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 -4px 10px rgba(0,0,0,0.2);
+  }
+  .support-header h1 {
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .support-header p {
+    font-size: 16.5px;
+    color: #cbd5e1;
+    max-width: 750px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* FRANJA INTERMEDIA */
+  .middle-bar {
+    background: var(--primary);
+    height: 35px;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+
+  /* CONTENEDOR DE CANALES DE ATENCIÓN */
+  .main-container { max-width: 1000px; width: 100%; margin: 60px auto; padding: 0 20px; flex: 1; text-align: center; }
+  .channels-title { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 40px; }
+
+  .channels-grid {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+  }
+
+  .channel-card {
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 35px 45px;
+    width: 360px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .channel-card:hover {
+    transform: translateY(-5px);
+    border-color: #2563eb;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.15);
+  }
+
+  .channel-icon {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    margin-bottom: 20px;
+    transition: transform 0.2s;
+  }
+  .channel-card:hover .channel-icon { transform: scale(1.1); }
+
+  .channel-card h3 { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+  .channel-card p { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+  .channel-action {
+    font-size: 14px; font-weight: 700; padding: 9px 20px; border-radius: 999px; transition: transform 0.2s;
+  }
+  .channel-card:hover .channel-action { transform: scale(1.05); }
+
+  /* FOOTER OSCURO LIBRE DE COPYRIGHT INSTITUCIONAL */
+  .footer-dark {
+    background: #090d16;
+    color: #94a3b8;
+    padding: 35px;
+    text-align: center;
+    border-top: 2px solid #1e293b;
+    margin-top: auto;
+  }
+  .footer-logo-text { font-size: 18px; font-weight: 900; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="/dashboard" class="brand-logo">⚡ ASINCRO</a>
+    <div class="nav-right-area">
+      <a href="javascript:history.back()" class="nav-link-top">← Regresar</a>
+      <a href="/dashboard" class="nav-link-top">Volver al Panel Principal</a>
+    </div>
+  </nav>
+
+  <div class="support-header">
+    <h1>Soporte Tecnológico 💻</h1>
+    <p>Hola, te damos la bienvenida al portal de soporte de ASINCRO. Aquí encontrarás solución rápida a todas tus dudas, gestión de equipos y consultas sobre el uso de la plataforma.</p>
+  </div>
+
+  <div class="middle-bar"></div>
+
+  <div class="main-container">
+    <h2 class="channels-title">Canales de Atención Oficiales</h2>
+
+    <div class="channels-grid">
+      <!-- WHATSAPP CON NÚMERO 982597386 -->
+      <a href="https://wa.me/51982597386?text=Hola,%20necesito%20soporte%20técnico%20con%20la%20plataforma%20ASINCRO." target="_blank" class="channel-card">
+        <div class="channel-icon">💬</div>
+        <h3>Atención por WhatsApp</h3>
+        <p>Comunícate directamente al <strong>+51 982 597 386</strong> con nuestro equipo de asistencia técnica.</p>
+        <span class="channel-action" style="color: #059669; background: #ecfdf5;">Abrir Chat de WhatsApp</span>
+      </a>
+
+      <!-- GMAIL WEB DIRECTO CON 60793177@continental.edu.pe -->
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=60793177@continental.edu.pe&su=Soporte%20Técnico%20-%20ASINCRO" target="_blank" class="channel-card">
+        <div class="channel-icon">✉️</div>
+        <h3>Correo Electrónico</h3>
+        <p>Escríbenos directamente a <strong>60793177@continental.edu.pe</strong> para reportar consultas o solicitudes.</p>
+        <span class="channel-action" style="color: #2563eb; background: #eff6ff;">Abrir en Gmail Web</span>
+      </a>
+    </div>
+  </div>
+
+  <footer class="footer-dark">
+    <span class="footer-logo-text">⚡ ASINCRO</span>
+    <p style="font-size: 12.5px; margin-top: 6px; color: #64748b;">© 2026 ASINCRO • Todos los derechos reservados</p>
+  </footer>
+
+</body>
+</html>
