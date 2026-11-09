@@ -19,10 +19,10 @@
     overflow: hidden;
   }
 
-  /* PANEL IZQUIERDO: FONDO CON IMAGEN TECNOLÓGICA Y TEXTOS */
+  /* PANEL IZQUIERDO: FONDO CON IMAGEN Y TEXTOS */
   .left-panel {
     flex: 1.2;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.90) 0%, rgba(30, 41, 59, 0.85) 100%), 
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.88) 100%), 
                 url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
     display: flex;
     flex-direction: column;
@@ -49,7 +49,7 @@
     max-width: 650px;
   }
 
-  /* CONTENEDOR DE TARJETAS ADAPTABLE */
+  /* CONTENEDOR DE TARJETAS */
   .features-grid {
     display: flex;
     gap: 16px;
@@ -60,7 +60,7 @@
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 16px;
-    padding: 20px;
+    padding: 22px;
     width: 220px;
     backdrop-filter: blur(6px);
     transition: transform 0.2s ease, background 0.2s ease;
@@ -71,16 +71,16 @@
   }
 
   .feature-title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 800;
     color: var(--accent);
     margin-bottom: 6px;
   }
 
   .feature-desc {
-    font-size: 13.5px;
+    font-size: 14px;
     color: #e2e8f0;
-    line-height: 1.4;
+    line-height: 1.45;
   }
 
   /* PANEL DERECHO: CAJA DE LOGIN */
@@ -96,16 +96,16 @@
   .login-card {
     background: #ffffff;
     border: 2px solid #e2e8f0;
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 45px;
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.06);
     text-align: center;
   }
 
   .login-logo {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 900;
     color: var(--primary);
     margin-bottom: 8px;
@@ -116,9 +116,10 @@
   }
 
   .login-subtitle {
-    font-size: 14.5px;
+    font-size: 15px;
     color: #64748b;
     margin-bottom: 30px;
+    line-height: 1.4;
   }
 
   /* BOTÓN GOOGLE */
@@ -130,9 +131,9 @@
     background: #ffffff;
     color: #1e293b;
     border: 2px solid #cbd5e1;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 15px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    font-size: 16px;
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
@@ -148,41 +149,63 @@
   }
 
   .google-icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
 
-  /* ADAPTACIÓN MÓVIL EXACTA */
+  /* ADAPTACIÓN MÓVIL ESTILO UNIVERSIDAD (AMPLIO Y CÓMODO) */
   @media (max-width: 900px) {
     body, html { 
       overflow: auto; 
-      flex-direction: column-reverse; /* Login arriba, contenido abajo */
+      flex-direction: column-reverse; /* Login arriba, texto y tarjetas abajo */
       height: auto; 
     }
-    .left-panel { 
-      padding: 30px 15px; 
-    }
-    .left-content h1 {
-      font-size: 28px;
-    }
-    .left-content p {
-      font-size: 14.5px;
-    }
     .right-panel { 
-      padding: 30px 15px; 
-      background: #0f172a; 
+      padding: 24px 16px; 
+      background: #0f172a; /* Fondo oscuro elegante arriba */
     }
     .login-card {
       max-width: 100%;
-      padding: 30px 20px;
+      padding: 35px 24px;
+      border-radius: 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
-    /* Estira las tarjetas al 100% del ancho en celulares como la universidad */
+    .login-subtitle {
+      font-size: 14.5px;
+      margin-bottom: 25px;
+    }
+    .btn-google {
+      padding: 15px;
+      font-size: 15.5px;
+    }
+    
+    .left-panel { 
+      padding: 35px 20px; 
+    }
+    .left-content h1 {
+      font-size: 30px;
+      line-height: 1.2;
+    }
+    .left-content p {
+      font-size: 15px;
+      margin-bottom: 25px;
+    }
+    
+    /* Tarjetas estiradas al 100% y con buen espacio interno */
     .features-grid {
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
     .feature-card {
       width: 100%;
+      padding: 24px 20px;
+      border-radius: 18px;
+    }
+    .feature-title {
+      font-size: 18px;
+    }
+    .feature-desc {
+      font-size: 14.5px;
     }
   }
 </style>
