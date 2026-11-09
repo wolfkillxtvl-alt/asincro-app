@@ -19,7 +19,7 @@
     overflow: hidden;
   }
 
-  /* PANEL IZQUIERDO: FONDO CON IMAGEN TECNOLÓGICA SEMIVISTA Y TEXTOS MÁS GRANDES */
+  /* PANEL IZQUIERDO: FONDO CON IMAGEN TECNOLÓGICA Y TEXTOS */
   .left-panel {
     flex: 1.2;
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.90) 0%, rgba(30, 41, 59, 0.85) 100%), 
@@ -30,10 +30,11 @@
     padding: 70px;
     color: #fff;
     position: relative;
+    overflow-y: auto;
   }
 
   .left-content h1 {
-    font-size: 44px;
+    font-size: 40px;
     font-weight: 900;
     line-height: 1.25;
     margin-bottom: 20px;
@@ -41,25 +42,26 @@
   }
 
   .left-content p {
-    font-size: 18px;
+    font-size: 17px;
     color: #cbd5e1;
     line-height: 1.6;
-    margin-bottom: 45px;
+    margin-bottom: 35px;
     max-width: 650px;
   }
 
+  /* CONTENEDOR DE TARJETAS ADAPTABLE */
   .features-grid {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     flex-wrap: wrap;
   }
 
   .feature-card {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 20px;
-    width: 210px;
+    width: 220px;
     backdrop-filter: blur(6px);
     transition: transform 0.2s ease, background 0.2s ease;
   }
@@ -81,7 +83,7 @@
     line-height: 1.4;
   }
 
-  /* PANEL DERECHO: CAJA DE LOGIN CLARA Y MODERNA */
+  /* PANEL DERECHO: CAJA DE LOGIN */
   .right-panel {
     flex: 0.9;
     background: #f8fafc;
@@ -119,7 +121,7 @@
     margin-bottom: 30px;
   }
 
-  /* BOTÓN GOOGLE CON INTERACCIÓN AVANZADA */
+  /* BOTÓN GOOGLE */
   .btn-google {
     display: flex;
     align-items: center;
@@ -145,38 +147,49 @@
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
   }
 
-  .btn-google:active {
-    transform: translateY(0);
-  }
-
   .google-icon {
     width: 20px;
     height: 20px;
   }
 
-  /* ADAPTACIÓN MÓVIL: PONE EL LOGIN PRIMERO ARRIBA */
+  /* ADAPTACIÓN MÓVIL EXACTA */
   @media (max-width: 900px) {
     body, html { 
       overflow: auto; 
-      flex-direction: column-reverse; /* Invierte el orden: derecho (login) queda arriba, izquierdo abajo */
+      flex-direction: column-reverse; /* Login arriba, contenido abajo */
       height: auto; 
     }
     .left-panel { 
-      padding: 40px 20px; 
+      padding: 30px 15px; 
+    }
+    .left-content h1 {
+      font-size: 28px;
+    }
+    .left-content p {
+      font-size: 14.5px;
     }
     .right-panel { 
-      padding: 40px 20px; 
-      background: #0f172a; /* Fondo oscuro opcional para resaltar la tarjeta de login arriba en móviles */
+      padding: 30px 15px; 
+      background: #0f172a; 
     }
     .login-card {
       max-width: 100%;
+      padding: 30px 20px;
+    }
+    /* Estira las tarjetas al 100% del ancho en celulares como la universidad */
+    .features-grid {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .feature-card {
+      width: 100%;
     }
   }
 </style>
 </head>
 <body>
 
-  <!-- PANEL IZQUIERDO CON IMAGEN DE FONDO Y TEXTOS MÁS GRANDES -->
+  <!-- PANEL IZQUIERDO -->
   <div class="left-panel">
     <div class="left-content">
       <h1>¡Bienvenidos! Una nueva experiencia de colaboración empieza aquí</h1>
@@ -199,7 +212,7 @@
     </div>
   </div>
 
-  <!-- PANEL DERECHO CON LOGIN GOOGLE -->
+  <!-- PANEL DERECHO -->
   <div class="right-panel">
     <div class="login-card">
       <div class="login-logo"><span>⚡</span> ASINCRO</div>
