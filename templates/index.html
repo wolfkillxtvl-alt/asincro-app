@@ -154,10 +154,23 @@
     height: 20px;
   }
 
+  /* ADAPTACIÓN MÓVIL: PONE EL LOGIN PRIMERO ARRIBA */
   @media (max-width: 900px) {
-    body, html { overflow: auto; flex-direction: column; height: auto; }
-    .left-panel { padding: 40px 20px; }
-    .right-panel { padding: 40px 20px; }
+    body, html { 
+      overflow: auto; 
+      flex-direction: column-reverse; /* Invierte el orden: derecho (login) queda arriba, izquierdo abajo */
+      height: auto; 
+    }
+    .left-panel { 
+      padding: 40px 20px; 
+    }
+    .right-panel { 
+      padding: 40px 20px; 
+      background: #0f172a; /* Fondo oscuro opcional para resaltar la tarjeta de login arriba en móviles */
+    }
+    .login-card {
+      max-width: 100%;
+    }
   }
 </style>
 </head>
