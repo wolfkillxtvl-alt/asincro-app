@@ -48,6 +48,10 @@ def index():
         return redirect(url_for('dashboard'))
     return render_template('index.html')
 
+@app.route('/robots.txt')
+def robots():
+    return "User-agent: *\nDisallow:", 200, {'Content-Type': 'text/plain'}
+
 @app.route('/login/google')
 def login_google():
     return google.authorize_redirect(url_for('authorize_google', _external=True))
@@ -490,8 +494,5 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-@app.route('/robots.txt')
-def robots():
-    return "User-agent: *\nDisallow:", 200, {'Content-Type': 'text/plain'}
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
