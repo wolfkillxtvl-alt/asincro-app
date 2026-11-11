@@ -1,5 +1,5 @@
 import os
-
+from flask import send_from_directory
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 import base64
@@ -12,7 +12,9 @@ app = Flask(__name__)
 app.secret_key = "asincro_super_secret_key"
 
 oauth = OAuth(app)
-
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'robots.txt')
 google = oauth.register(
     name='google',
     client_id=GOOGLE_CLIENT_ID,
